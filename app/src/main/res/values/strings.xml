@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">RunningEvents</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="login">Login</string>
+    <string name="signup">Signup</string>
+    <string name="signin">Signin</string>
+    <string name="e_mail">E-mail</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="continue_without_registration">Continue without registration</string>
+    <string name="email_not_valid">E-mail address is not valid</string>
+    <string name="password_to_short">Password is too short</string>
+    <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>
