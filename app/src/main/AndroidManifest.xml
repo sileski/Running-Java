@@ -14,12 +14,12 @@
         android:theme="@style/Theme.RunningEvents"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".Login.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password"
             android:theme="@style/Theme.RunningEvents.NoActionBar"
-            android:parentActivityName=".LoginActivity"></activity>
+            android:parentActivityName=".Login.LoginActivity"></activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".Login.LoginActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

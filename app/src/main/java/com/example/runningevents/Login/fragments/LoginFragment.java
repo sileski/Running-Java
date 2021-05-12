@@ -1,4 +1,4 @@
-package com.example.runningevents;
+package com.example.runningevents.Login.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.runningevents.R;
+import com.example.runningevents.Login.ForgotPasswordActivity;
+import com.example.runningevents.Login.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -57,10 +59,6 @@ public class LoginFragment extends Fragment {
         loginBtn = view.findViewById(R.id.siginMbtn);
         forgotPassword = view.findViewById(R.id.forgotPasswordTv);
 
-
-        emailInputLayout.setTranslationX(800);
-        emailInputLayout.setAlpha(0);
-        emailInputLayout.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
 
         emailEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -122,14 +120,15 @@ public class LoginFragment extends Fragment {
             public void onClick(View v) {
                 String email = String.valueOf(emailEditText.getText());
                 String password = String.valueOf(passwordEditText.getText());
+                FirebaseAuth firebaseAuth =FirebaseAuth.getInstance();
                 if (isEmailValid(email) && isPasswordValid(password)) {
-                    ((LoginActivity) getActivity()).firebaseAuth.signInWithEmailAndPassword(email, password)
+                    firebaseAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
                                         Log.d(TAG, "signInWithEmail:success");
-                                        FirebaseUser user = ((LoginActivity) getActivity()).firebaseAuth.getCurrentUser();
+                                        FirebaseUser user = firebaseAuth.getCurrentUser();
                                     } else {
                                         Log.w(TAG, "signInWithEmail:failure", task.getException());
                                     }

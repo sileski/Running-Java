@@ -1,13 +1,13 @@
-package com.example.runningevents;
-
-import android.content.Context;
+package com.example.runningevents.Login.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
+
+import com.example.runningevents.Login.fragments.LoginFragment;
+import com.example.runningevents.Login.fragments.SignupFragment;
 
 public class LoginAdapter extends FragmentStateAdapter {
 
@@ -24,6 +24,8 @@ public class LoginAdapter extends FragmentStateAdapter {
         switch (position){
             case 0:
                 return new LoginFragment();
+            case 1:
+                return new SignupFragment();
             default:
                  return new LoginFragment();
         }

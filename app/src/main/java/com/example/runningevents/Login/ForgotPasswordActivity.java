@@ -1,14 +1,11 @@
-package com.example.runningevents;
+package com.example.runningevents.Login;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.runningevents.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import android.view.View;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
