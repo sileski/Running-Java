@@ -1,6 +1,8 @@
 package com.example.runningevents.Login.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.runningevents.R;
@@ -58,6 +62,7 @@ public class LoginFragment extends Fragment {
         passwordEditText = view.findViewById(R.id.passwordEditText);
         loginBtn = view.findViewById(R.id.siginMbtn);
         forgotPassword = view.findViewById(R.id.forgotPasswordTv);
+
 
 
         emailEditText.addTextChangedListener(new TextWatcher() {
@@ -138,6 +143,9 @@ public class LoginFragment extends Fragment {
             }
         });
 
+
+
+
         return view;
     }
 
@@ -158,5 +166,11 @@ public class LoginFragment extends Fragment {
         else {
             return false;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().requestLayout();
     }
 }

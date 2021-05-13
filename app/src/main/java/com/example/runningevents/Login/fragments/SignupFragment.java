@@ -130,4 +130,9 @@ public class SignupFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().requestLayout();
+    }
 }

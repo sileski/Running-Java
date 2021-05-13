@@ -1,5 +1,7 @@
 package com.example.runningevents.Login.adapters;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -27,7 +29,7 @@ public class LoginAdapter extends FragmentStateAdapter {
             case 1:
                 return new SignupFragment();
             default:
-                 return new LoginFragment();
+                return new LoginFragment();
         }
     }
 
@@ -35,4 +37,5 @@ public class LoginAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return totalTabs;
     }
+
 }
