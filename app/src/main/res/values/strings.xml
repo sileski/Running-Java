@@ -9,6 +9,7 @@
     <string name="password">Password</string>
     <string name="password_confirm">Confirm password</string>
     <string name="forgot_password">Forgot password?</string>
+    <string name="reset_password">Reset Password</string>
     <string name="continue_without_registration">Continue without registration</string>
     <string name="email_not_valid">E-mail address is not valid</string>
     <string name="password_to_short">Password is too short</string>
