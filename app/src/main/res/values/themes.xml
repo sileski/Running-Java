@@ -13,11 +13,45 @@
         <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="fontFamily">@font/roboto</item> <!-- target android sdk versions < 26 and > 14 if theme other than AppCompat -->
     </style>
 
+    <!-- Forgot password activity theme -->
+    <style name="Theme.RunningEvents.ForgotPassword" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/green</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/green</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="fontFamily">@font/roboto</item> <!-- target android sdk versions < 26 and > 14 if theme other than AppCompat -->
+    </style>
+
+    <!-- Add new race dialog theme -->
+    <style name="Theme.NewRaceDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorAccent">@color/green</item>
+        <item name="colorPrimary">@color/blue</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="actionMenuTextColor">@color/white</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/blue</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
     <style name="Theme.RunningEvents.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Toolbar_New_Race" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <!-- color used by navigation icon and overflow icon -->
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+
+    <style name="Theme.RunningEvents.Slide">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 
     <style name="Theme.RunningEvents.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

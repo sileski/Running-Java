@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.runningevents.Login.adapters.LoginAdapter;
 import com.example.runningevents.Login.fragments.LoginFragment;
 import com.example.runningevents.Login.fragments.SignupFragment;
+import com.example.runningevents.MainActivity;
 import com.example.runningevents.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -180,7 +181,9 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             // reload();
-            Toast.makeText(getApplicationContext(), "User is already logged", Toast.LENGTH_LONG).show();
+           Toast.makeText(getApplicationContext(), "User is already logged " + currentUser.getDisplayName(), Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         }
     }
 

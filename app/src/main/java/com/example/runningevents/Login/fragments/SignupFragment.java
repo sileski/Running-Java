@@ -20,6 +20,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.regex.Pattern;
 
@@ -84,6 +85,23 @@ public class SignupFragment extends Fragment {
                             {
                                 Log.d(TAG, "createUserWithEmail:success");
                                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                                UserProfileChangeRequest profileUpdateName = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(name)
+                                        .build();
+
+                                user.updateProfile(profileUpdateName).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            Log.d(TAG, "User name updated");
+                                        }
+                                        else
+                                        {
+                                            Log.d(TAG, "User name is not updated.");
+                                        }
+                                    }
+                                });
                             }
                             else {
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
