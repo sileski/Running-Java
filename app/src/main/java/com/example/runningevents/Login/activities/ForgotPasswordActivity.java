@@ -1,4 +1,4 @@
-package com.example.runningevents.Login;
+package com.example.runningevents.Login.activities;
 
 import android.os.Bundle;
 import android.util.Log;

@@ -1,8 +1,6 @@
 package com.example.runningevents.Login.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.input.InputManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,13 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.runningevents.R;
-import com.example.runningevents.Login.ForgotPasswordActivity;
-import com.example.runningevents.Login.LoginActivity;
+import com.example.runningevents.Login.activities.ForgotPasswordActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;

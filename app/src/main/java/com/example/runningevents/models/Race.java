@@ -1,4 +1,4 @@
-package com.example.runningevents.model;
+package com.example.runningevents.models;
 
 import com.google.firebase.Timestamp;
 

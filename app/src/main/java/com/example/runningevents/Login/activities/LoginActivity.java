@@ -1,28 +1,18 @@
-package com.example.runningevents.Login;
+package com.example.runningevents.Login.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.runningevents.Login.adapters.LoginAdapter;
-import com.example.runningevents.Login.fragments.LoginFragment;
-import com.example.runningevents.Login.fragments.SignupFragment;
+import com.example.runningevents.adapters.LoginViewPagerAdapter;
 import com.example.runningevents.MainActivity;
 import com.example.runningevents.R;
 import com.facebook.AccessToken;
@@ -43,7 +33,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -57,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final int GOOGLE_LOGIN = 100;
     TabLayout loginTabLayout;
     ViewPager2 loginViewPager;
-    LoginAdapter loginAdapter;
+    LoginViewPagerAdapter loginViewPagerAdapter;
 
     FirebaseAuth firebaseAuth;
     GoogleSignInClient mGoogleSignInClient;
@@ -90,8 +79,8 @@ public class LoginActivity extends AppCompatActivity {
         loginTabLayout.addTab(loginTabLayout.newTab().setText(R.string.signup));
         loginTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        loginAdapter = new LoginAdapter(getSupportFragmentManager(), getLifecycle(), loginTabLayout.getTabCount());
-        loginViewPager.setAdapter(loginAdapter);
+        loginViewPagerAdapter = new LoginViewPagerAdapter(getSupportFragmentManager(), getLifecycle(), loginTabLayout.getTabCount());
+        loginViewPager.setAdapter(loginViewPagerAdapter);
 
         loginTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

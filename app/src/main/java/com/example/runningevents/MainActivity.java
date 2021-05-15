@@ -3,6 +3,7 @@ package com.example.runningevents;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.view.View;
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
+
 
                 NewRaceDialogFragment.display(getSupportFragmentManager());
             }

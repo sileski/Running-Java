@@ -1,6 +1,4 @@
-package com.example.runningevents.Login.adapters;
-
-import android.view.View;
+package com.example.runningevents.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -11,11 +9,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.example.runningevents.Login.fragments.LoginFragment;
 import com.example.runningevents.Login.fragments.SignupFragment;
 
-public class LoginAdapter extends FragmentStateAdapter {
+public class LoginViewPagerAdapter extends FragmentStateAdapter {
 
     int totalTabs;
 
-    public LoginAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, int totalTabs) {
+    public LoginViewPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, int totalTabs) {
         super(fragmentManager, lifecycle);
         this.totalTabs = totalTabs;
     }
