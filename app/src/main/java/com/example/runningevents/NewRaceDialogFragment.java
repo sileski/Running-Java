@@ -3,10 +3,14 @@ package com.example.runningevents;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
@@ -30,6 +36,8 @@ import com.example.runningevents.api.CountriesApiClient;
 import com.example.runningevents.api.CountriesApiService;
 import com.example.runningevents.models.Cities;
 import com.example.runningevents.models.Countries;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
@@ -39,8 +47,12 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.type.DateTime;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,11 +65,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.app.Activity.RESULT_OK;
 import static android.text.format.DateFormat.is24HourFormat;
 
 public class NewRaceDialogFragment extends DialogFragment {
 
     public static final String TAG = "new_race_dialog";
+    private final static int SELECT_IMAGE = 100;
     private boolean dialogPickerClicked = false;
 
     private Toolbar toolbar;
@@ -74,6 +88,10 @@ public class NewRaceDialogFragment extends DialogFragment {
     AutoCompleteTextView cityTextView;
     TextInputEditText dateEditText;
     TextInputEditText timeEditText;
+
+    Uri imgUri;
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
     MaterialDatePicker datePicker;
     MaterialTimePicker timePicker;
@@ -102,11 +120,20 @@ public class NewRaceDialogFragment extends DialogFragment {
         toolbar = view.findViewById(R.id.toolbar);
         containerCategories = view.findViewById(R.id.containerCategories);
         newCategoryBtn = view.findViewById(R.id.newCategoryMbtn);
-        selectImage =  (ImageView)view.findViewById(R.id.imageSelect);
+        selectImage = (ImageView) view.findViewById(R.id.imageSelect);
         dateEditText = view.findViewById(R.id.dateEditText);
         timeEditText = view.findViewById(R.id.timeEditText);
         countryTextView = view.findViewById(R.id.countryIputText);
         cityTextView = view.findViewById(R.id.cityInputText);
+
+        storage = FirebaseStorage.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
+
+        adapterCountries = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, getCountriesList());
+        countryTextView.setAdapter(adapterCountries);
+
+        adapterCategories = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, getCategoriesList());
+        addNewCategoryField();
 
 
         selectImage.setOnClickListener(new View.OnClickListener() {
@@ -114,13 +141,10 @@ public class NewRaceDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 Toast.makeText(v.getContext(), "image selected", Toast.LENGTH_LONG).show();
                 selectImage.setImageResource(R.drawable.example);
+                openImageSelector();
             }
         });
 
-        ArrayList<String> list = new ArrayList<>();
-        list.add("Macedonia");
-        adapterCountries = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, list);
-        countryTextView.setAdapter(adapterCountries);
 
         ArrayList<String> citiesList = new ArrayList<>();
         CountriesApiService countriesApiService = CountriesApiClient.getCountriesApiClient().create(CountriesApiService.class);
@@ -135,21 +159,20 @@ public class NewRaceDialogFragment extends DialogFragment {
                 } else {
                     Log.d(TAG, "i am not 22");
                 }
-                if(response.isSuccessful()){
-                    Log.d("tag","works " + response.body().getError());
+                if (response.isSuccessful()) {
+                    Log.d("tag", "works " + response.body().getError());
                     Cities cities = response.body();
                     citiesList.addAll(cities.getData());
                     adapterCities = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, citiesList);
                     cityTextView.setAdapter(adapterCities);
-                }
-                else {
-                    Log.d("tag","works no response");
+                } else {
+                    Log.d("tag", "works no response");
                 }
             }
 
             @Override
             public void onFailure(Call<Cities> call, Throwable t) {
-                Log.d("tag","works greska " + t);
+                Log.d("tag", "works greska " + t);
             }
         });
 
@@ -181,9 +204,6 @@ public class NewRaceDialogFragment extends DialogFragment {
         });
 
 
-        adapterCategories = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, getCategoriesList());
-        addNewCategoryField();
-
         return view;
     }
 
@@ -212,6 +232,24 @@ public class NewRaceDialogFragment extends DialogFragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SELECT_IMAGE && resultCode == RESULT_OK) {
+            imgUri = data.getData();
+            final String path = getPathFromURI(imgUri);
+            if (path != null) {
+                File file = new File(path);
+                imgUri = Uri.fromFile(file);
+            }
+
+            selectImage.setImageURI(imgUri);
+            uploadImageToFirebaseStorage();
+        }
+
+    }
+
     private void showDatePicker() {
         Thread thread = new Thread() {
             @Override
@@ -223,7 +261,7 @@ public class NewRaceDialogFragment extends DialogFragment {
                     } else {
                         Log.d(TAG, "i am not");
                     }
-                    Log.d("theard counter", "Current thread: " + Thread.activeCount() + " " + Thread.currentThread().getName() );
+                    Log.d("theard counter", "Current thread: " + Thread.activeCount() + " " + Thread.currentThread().getName());
                     CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder().setValidator(DateValidatorPointForward.from(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
                     datePicker = MaterialDatePicker.Builder.datePicker()
                             .setTitleText("Select date")
@@ -256,7 +294,7 @@ public class NewRaceDialogFragment extends DialogFragment {
                         }
                     });
                     datePicker.show(getParentFragmentManager(), "tag");
-                }catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -317,7 +355,8 @@ public class NewRaceDialogFragment extends DialogFragment {
         });
     }
 
-    private void saveRace(){}
+    private void saveRace() {
+    }
 
     private void addNewCategoryField() {
         View view = getLayoutInflater().inflate(R.layout.category_item, null);
@@ -346,7 +385,7 @@ public class NewRaceDialogFragment extends DialogFragment {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(containerCategories.getChildCount() > 1) {
+                if (containerCategories.getChildCount() > 1) {
                     containerCategories.removeView(view);
                 }
             }
@@ -354,13 +393,71 @@ public class NewRaceDialogFragment extends DialogFragment {
         containerCategories.addView(view);
     }
 
-    private ArrayList getCategoriesList(){
-        ArrayList<String> listCategories = new ArrayList<>();;
+    private ArrayList getCategoriesList() {
+        ArrayList<String> listCategories = new ArrayList<>();
+        ;
         listCategories.add("5km");
         listCategories.add("10km");
         listCategories.add("Half-Marathon");
         listCategories.add("Marathon");
 
         return listCategories;
+    }
+
+    private ArrayList getCountriesList(){
+        ArrayList<String> listCountries = new ArrayList<>();
+        listCountries.add("Macedonia");
+        listCountries.add("Serbia");
+        listCountries.add("Montenegro");
+        listCountries.add("Germany");
+
+        return listCountries;
+    }
+
+    private void openImageSelector() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), SELECT_IMAGE);
+    }
+
+    private String getPathFromURI(Uri contentUri) {
+        String path = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContext().getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            path = cursor.getString(column_index);
+        }
+        cursor.close();
+        return path;
+    }
+
+    private void uploadImageToFirebaseStorage(){
+        Long randomNumber = System.currentTimeMillis() / 1000;
+        String randomNumberString = randomNumber.toString();
+        StorageReference imagesReference = storageReference.child("images/" + randomNumberString);
+        imagesReference.putFile(imgUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded image
+                        imagesReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Uri downloadUrl = uri;
+                                System.out.println("Success url is " + downloadUrl);
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        System.out.println("Fail");
+                    }
+                });
     }
 }
