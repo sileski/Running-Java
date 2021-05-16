@@ -7,17 +7,22 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Looper;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -57,6 +62,12 @@ public class NewRaceDialogFragment extends DialogFragment {
 
     private Toolbar toolbar;
 
+    LinearLayout containerCategories;
+    TextInputLayout inputLayout;
+    AutoCompleteTextView editText;
+    ArrayAdapter adapterCategories;
+    MaterialButton newCategoryBtn;
+
     ImageView selectImage;
     TextInputLayout dateInputLayout;
     AutoCompleteTextView countryTextView;
@@ -89,6 +100,8 @@ public class NewRaceDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_fragment_new_race, container, false);
 
         toolbar = view.findViewById(R.id.toolbar);
+        containerCategories = view.findViewById(R.id.containerCategories);
+        newCategoryBtn = view.findViewById(R.id.newCategoryMbtn);
         selectImage =  (ImageView)view.findViewById(R.id.imageSelect);
         dateEditText = view.findViewById(R.id.dateEditText);
         timeEditText = view.findViewById(R.id.timeEditText);
@@ -157,6 +170,19 @@ public class NewRaceDialogFragment extends DialogFragment {
                 }
             }
         });
+
+        newCategoryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (containerCategories.getChildCount() <= 5) {
+                    addNewCategoryField();
+                }
+            }
+        });
+
+
+        adapterCategories = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, getCategoriesList());
+        addNewCategoryField();
 
         return view;
     }
@@ -292,4 +318,49 @@ public class NewRaceDialogFragment extends DialogFragment {
     }
 
     private void saveRace(){}
+
+    private void addNewCategoryField() {
+        View view = getLayoutInflater().inflate(R.layout.category_item, null);
+        ConstraintLayout.LayoutParams margins = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        margins.topMargin = 10;
+        view.setLayoutParams(margins);
+
+        Button delete = view.findViewById(R.id.deleteBtn);
+
+        inputLayout = view.findViewById(R.id.inputLayout);
+        editText = view.findViewById(R.id.inputText);
+        editText.setAdapter(adapterCategories);
+
+//        editText.setText(adapter.getItem(0).toString(), false);
+
+
+        Editable selectedValue = ((AutoCompleteTextView) inputLayout.getEditText()).getText();
+        ((AutoCompleteTextView) inputLayout.getEditText()).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Log.d("Item selected is ", "clicked");
+            }
+        });
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(containerCategories.getChildCount() > 1) {
+                    containerCategories.removeView(view);
+                }
+            }
+        });
+        containerCategories.addView(view);
+    }
+
+    private ArrayList getCategoriesList(){
+        ArrayList<String> listCategories = new ArrayList<>();;
+        listCategories.add("5km");
+        listCategories.add("10km");
+        listCategories.add("Half-Marathon");
+        listCategories.add("Marathon");
+
+        return listCategories;
+    }
 }

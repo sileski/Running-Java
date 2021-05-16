@@ -8,21 +8,21 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:elevation="0dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:theme="@style/Toolbar_New_Race"
-            android:paddingEnd="16dp"
             android:paddingStart="6dp"
+            android:paddingEnd="16dp"
+            android:theme="@style/Toolbar_New_Race"
             app:contentInsetStartWithNavigation="0dp"
-            app:titleTextColor="@color/white"
-            app:navigationIcon="@drawable/ic_close" />
+            app:navigationIcon="@drawable/ic_close"
+            app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -31,8 +31,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:scrollbars="none"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,23 +44,25 @@
                 android:id="@+id/imageHolder"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/image_border"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:background="@drawable/image_border">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
                 <ImageView
                     android:id="@+id/imageSelect"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true" />
+
                 <ImageView
                     android:id="@+id/center"
-                    android:layout_height="50dp"
                     android:layout_width="match_parent"
-                    android:src="@drawable/ic_camera"
+                    android:layout_height="50dp"
                     android:layout_centerInParent="true"
-                    android:layout_centerVertical="true"   />
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_camera" />
             </RelativeLayout>
 
             <TextView
@@ -88,7 +90,7 @@
                     android:id="@+id/raceNameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="2"/>
+                    android:maxLines="2" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -163,70 +165,133 @@
                 android:layout_marginTop="10dp"
                 android:text="@string/date"
                 android:textSize="16sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cityInputLayout"
-                app:layout_constraintRight_toLeftOf="@id/timeLabel"
                 app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintHorizontal_weight="2"/>
+                app:layout_constraintHorizontal_weight="2"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/timeLabel"
+                app:layout_constraintTop_toBottomOf="@id/cityInputLayout" />
 
             <TextView
                 android:id="@+id/timeLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="30dp"
                 android:text="@string/time"
                 android:textSize="16sp"
-                app:layout_constraintTop_toBottomOf="@id/cityInputLayout"
+                app:layout_constraintHorizontal_weight="1.5"
                 app:layout_constraintLeft_toRightOf="@+id/dateLabel"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintHorizontal_weight="1.5"/>
+                app:layout_constraintTop_toBottomOf="@id/cityInputLayout" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/button_save"
+                android:id="@+id/dateInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
-                android:text="fasfsa"
                 android:layout_marginStart="30dp"
-                app:layout_constraintTop_toBottomOf="@id/dateLabel"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@+id/timeInputLayout"
+                android:clickable="true"
+                android:text="fasfsa"
+                app:hintEnabled="false"
                 app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintHorizontal_weight="2"
-                android:clickable="true"
-                app:hintEnabled="false">
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/timeInputLayout"
+                app:layout_constraintTop_toBottomOf="@id/dateLabel">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/dateEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
                     android:clickable="true"
-                    android:inputType="text"/>
+                    android:focusable="false"
+                    android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/timeInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
-                app:layout_constraintTop_toBottomOf="@id/dateLabel"
-                app:layout_constraintLeft_toRightOf="@+id/button_save"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintHorizontal_weight="1.5"
                 android:clickable="true"
-                app:hintEnabled="false">
+                app:hintEnabled="false"
+                app:layout_constraintHorizontal_weight="1.5"
+                app:layout_constraintLeft_toRightOf="@+id/dateInputLayout"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dateLabel">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/timeEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
                     android:clickable="true"
-                    android:inputType="text"/>
+                    android:focusable="false"
+                    android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/websiteLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/website"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dateInputLayout" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/websiteInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                app:hintEnabled="false"
+                app:layout_constraintTop_toBottomOf="@id/websiteLabel">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/websiteEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <TextView
+                android:id="@+id/categoriesLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/categories"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/websiteInputLayout" />
+
+            <LinearLayout
+                android:id="@+id/containerCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/categoriesLabel"
+                android:orientation="vertical"></LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/newCategoryMbtn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginLeft="30dp"
+                android:text="Add Category"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_plus"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/containerCategories" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
