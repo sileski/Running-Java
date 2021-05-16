@@ -14,6 +14,12 @@
     <string name="email_not_valid">E-mail address is not valid</string>
     <string name="password_to_short">Password is too short</string>
     <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
+    <string name="race_name">Race Name</string>
+    <string name="country">Country</string>
+    <string name="city">City</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="category">Category</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -56,6 +57,8 @@ public class NewRaceDialogFragment extends DialogFragment {
 
     private Toolbar toolbar;
 
+    ImageView selectImage;
+    TextInputLayout dateInputLayout;
     AutoCompleteTextView countryTextView;
     AutoCompleteTextView cityTextView;
     TextInputEditText dateEditText;
@@ -86,15 +89,18 @@ public class NewRaceDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_fragment_new_race, container, false);
 
         toolbar = view.findViewById(R.id.toolbar);
+        selectImage =  (ImageView)view.findViewById(R.id.imageSelect);
         dateEditText = view.findViewById(R.id.dateEditText);
         timeEditText = view.findViewById(R.id.timeEditText);
         countryTextView = view.findViewById(R.id.countryIputText);
         cityTextView = view.findViewById(R.id.cityInputText);
-        MaterialButton btn = view.findViewById(R.id.testBtn);
-        btn.setOnClickListener(new View.OnClickListener() {
+
+
+        selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("theard counter", "Current thread: " + Thread.activeCount() + " " + Thread.currentThread().getName() );
+                Toast.makeText(v.getContext(), "image selected", Toast.LENGTH_LONG).show();
+                selectImage.setImageResource(R.drawable.example);
             }
         });
 
@@ -134,7 +140,7 @@ public class NewRaceDialogFragment extends DialogFragment {
             }
         });
 
-        dateEditText.setText("Select date");
+
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
