@@ -1,22 +1,21 @@
 package com.example.runningevents;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -25,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -32,10 +32,16 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.runningevents.api.CountriesApiClient;
 import com.example.runningevents.api.CountriesApiService;
 import com.example.runningevents.models.Cities;
 import com.example.runningevents.models.Countries;
+import com.example.runningevents.models.Race;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -47,18 +53,24 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.type.DateTime;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
-import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -82,14 +94,22 @@ public class NewRaceDialogFragment extends DialogFragment {
     ArrayAdapter adapterCategories;
     MaterialButton newCategoryBtn;
 
+    TextInputEditText raceNameEditText;
+    TextInputEditText websiteEditText;
+
     ImageView selectImage;
+    ImageView cameraIcon;
     TextInputLayout dateInputLayout;
+    TextInputLayout countryInputLayout;
     AutoCompleteTextView countryTextView;
     AutoCompleteTextView cityTextView;
     TextInputEditText dateEditText;
     TextInputEditText timeEditText;
 
+    FirebaseFirestore db;
+
     Uri imgUri;
+    Uri imageDownloadUrl;
     FirebaseStorage storage;
     StorageReference storageReference;
 
@@ -98,6 +118,9 @@ public class NewRaceDialogFragment extends DialogFragment {
 
     ArrayAdapter adapterCountries;
     ArrayAdapter adapterCities;
+
+    ArrayList<String> categories = new ArrayList<>();
+    HashMap<Integer, String> selectedCategory = new HashMap<>();
 
 
     public static NewRaceDialogFragment display(FragmentManager fragmentManager) {
@@ -117,15 +140,21 @@ public class NewRaceDialogFragment extends DialogFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.dialog_fragment_new_race, container, false);
 
+        //Initializing views
         toolbar = view.findViewById(R.id.toolbar);
         containerCategories = view.findViewById(R.id.containerCategories);
         newCategoryBtn = view.findViewById(R.id.newCategoryMbtn);
         selectImage = (ImageView) view.findViewById(R.id.imageSelect);
+        cameraIcon = (ImageView) view.findViewById(R.id.cameraIcon);
+        raceNameEditText = view.findViewById(R.id.raceNameEditText);
+        websiteEditText = view.findViewById(R.id.websiteEditText);
         dateEditText = view.findViewById(R.id.dateEditText);
         timeEditText = view.findViewById(R.id.timeEditText);
+        countryInputLayout = view.findViewById(R.id.countryInputLayout);
         countryTextView = view.findViewById(R.id.countryIputText);
         cityTextView = view.findViewById(R.id.cityInputText);
 
+        db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -139,43 +168,19 @@ public class NewRaceDialogFragment extends DialogFragment {
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), "image selected", Toast.LENGTH_LONG).show();
-                selectImage.setImageResource(R.drawable.example);
                 openImageSelector();
             }
         });
 
 
-        ArrayList<String> citiesList = new ArrayList<>();
-        CountriesApiService countriesApiService = CountriesApiClient.getCountriesApiClient().create(CountriesApiService.class);
-        Countries countries = new Countries();
-        countries.country = "macedonia";
-        Call<Cities> citiesCall = countriesApiService.getCities(countries);
-        citiesCall.enqueue(new Callback<Cities>() {
+        countryTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onResponse(Call<Cities> call, Response<Cities> response) {
-                if (Looper.myLooper() == Looper.getMainLooper()) {
-                    Log.d(TAG, "i am on main 22");
-                } else {
-                    Log.d(TAG, "i am not 22");
-                }
-                if (response.isSuccessful()) {
-                    Log.d("tag", "works " + response.body().getError());
-                    Cities cities = response.body();
-                    citiesList.addAll(cities.getData());
-                    adapterCities = new ArrayAdapter(view.getContext(), android.R.layout.simple_dropdown_item_1line, citiesList);
-                    cityTextView.setAdapter(adapterCities);
-                } else {
-                    Log.d("tag", "works no response");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Cities> call, Throwable t) {
-                Log.d("tag", "works greska " + t);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(view.getContext(), "selected item is " + adapterCountries.getItem(position), Toast.LENGTH_LONG).show();
+                String selectedCountry = adapterCountries.getItem(position).toString();
+                getCitiesFromApi(selectedCountry);
             }
         });
-
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,8 +209,31 @@ public class NewRaceDialogFragment extends DialogFragment {
         });
 
 
+       // countryInputLayout.getEditText().addTextChangedListener(textWatcher);
+       // dateEditText.addTextChangedListener(textWatcher);
+
+
         return view;
     }
+
+   /* private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(dateEditText.getText() != null && countryInputLayout.getEditText() != null){
+                Toast.makeText(getContext(), "WORKUVA", Toast.LENGTH_LONG).show();
+            }
+        }
+    }; */
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -214,8 +242,7 @@ public class NewRaceDialogFragment extends DialogFragment {
         toolbar.setTitle("Add new race");
         toolbar.inflateMenu(R.menu.menu_new_race);
         toolbar.setOnMenuItemClickListener(item -> {
-            Toast.makeText(view.getContext(), "New race is added", Toast.LENGTH_LONG).show();
-            dismiss();
+           uploadImageToFirebaseStorage();
             return true;
         });
     }
@@ -244,8 +271,22 @@ public class NewRaceDialogFragment extends DialogFragment {
                 imgUri = Uri.fromFile(file);
             }
 
-            selectImage.setImageURI(imgUri);
-            uploadImageToFirebaseStorage();
+            Glide.with(getContext())
+                    .load(imgUri)
+                    .centerCrop()
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            cameraIcon.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(selectImage);
         }
 
     }
@@ -318,18 +359,21 @@ public class NewRaceDialogFragment extends DialogFragment {
                 .setHour(12)
                 .setMinute(0)
                 .build();
-        timePicker.show(getParentFragmentManager(), "tag33");
+        timePicker.show(getParentFragmentManager(), "timepicker");
         timePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timeEditText.setText(timePicker.getHour() + ":" + timePicker.getMinute());
+                String time = timePicker.getHour() + ":" + timePicker.getMinute();
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                try {
+                    Date date = timeFormat.parse(time);
+                    String localTime = timeFormat.format(date);
+                    timeEditText.setText(localTime);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
                 dialogPickerClicked = false;
-              /*  //get timestamp
-                long dateSeconds = (long) datePicker.getSelection();
-                long hourSeconds = TimeUnit.HOURS.toMillis(timePicker.getHour());
-                long minuteSeconds = TimeUnit.MINUTES.toMillis(timePicker.getMinute());
-                long timestamp = dateSeconds + hourSeconds + minuteSeconds;
-                Log.d("data", "test is " + timestamp); */
             }
         });
 
@@ -356,6 +400,77 @@ public class NewRaceDialogFragment extends DialogFragment {
     }
 
     private void saveRace() {
+        String raceName = "";
+        String country = "";
+        String city = "";
+        String website = "";
+        String imageUrl = "";
+        Timestamp timestamp;
+        if(isDataValid()) {
+            raceName = raceNameEditText.getText().toString();
+            country = countryTextView.getText().toString();
+            city = cityTextView.getText().toString();
+            timestamp = getTimestamp();
+            categories = new ArrayList<String>(selectedCategory.values());
+            if(websiteEditText.getText() != null) {
+                website = websiteEditText.getText().toString();
+            }
+            if(imageDownloadUrl != null) {
+                imageUrl = imageDownloadUrl.toString();
+            }
+
+            //Create race object
+            Race race = new Race();
+            race.setRaceName(raceName);
+            race.setCategories(categories);
+            race.setDistancesFilter(getDistanceFilter());
+            race.setCountry(country);
+            race.setCity(city);
+            race.setDate(timestamp);
+            race.setWebsiteUrl(website);
+            race.setImageUrl(imageUrl);
+
+
+            db.collection("races")
+                    .add(race)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d(TAG, "Race is added");
+                            Toast.makeText(getContext(), "New race is added", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "Error ", e);
+                        }
+                    });
+        }
+    }
+
+    private boolean isDataValid(){
+        if(raceNameEditText.getText().length() <5){
+            return false;
+        }
+        else if(countryTextView.getText() == null){
+            return false;
+        }
+        else if(cityTextView.getText() == null)
+        {
+            return false;
+        }
+        else if(dateEditText.getText() == null)
+        {
+            return false;
+        }
+        else if(timeEditText.getText() == null){
+            return false;
+        }
+        else if(selectedCategory.size() <= 0){
+            return false;
+        }
+        return true;
     }
 
     private void addNewCategoryField() {
@@ -371,26 +486,37 @@ public class NewRaceDialogFragment extends DialogFragment {
         editText = view.findViewById(R.id.inputText);
         editText.setAdapter(adapterCategories);
 
+
 //        editText.setText(adapter.getItem(0).toString(), false);
 
-
-        Editable selectedValue = ((AutoCompleteTextView) inputLayout.getEditText()).getText();
         ((AutoCompleteTextView) inputLayout.getEditText()).setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Log.d("Item selected is ", "clicked");
+            public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
+
+                if (selectedCategory.get(getIndex(containerCategories, view)) != null) {
+                    selectedCategory.remove(getIndex(containerCategories, view));
+                }
+                selectedCategory.put(getIndex(containerCategories, view), adapterCategories.getItem(position).toString());
+                Log.d(TAG, "elementot e razlicen " + getIndex(containerCategories, view));
+
+
             }
         });
-
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (containerCategories.getChildCount() > 1) {
+                    int position = getIndex(containerCategories, view);
+                    selectedCategory.remove(getIndex(containerCategories, view));
                     containerCategories.removeView(view);
                 }
             }
         });
         containerCategories.addView(view);
+    }
+
+    private int getIndex(LinearLayout view, View childView) {
+        return view.indexOfChild(childView) - 1;
     }
 
     private ArrayList getCategoriesList() {
@@ -404,7 +530,7 @@ public class NewRaceDialogFragment extends DialogFragment {
         return listCategories;
     }
 
-    private ArrayList getCountriesList(){
+    private ArrayList getCountriesList() {
         ArrayList<String> listCountries = new ArrayList<>();
         listCountries.add("Macedonia");
         listCountries.add("Serbia");
@@ -433,31 +559,101 @@ public class NewRaceDialogFragment extends DialogFragment {
         return path;
     }
 
-    private void uploadImageToFirebaseStorage(){
-        Long randomNumber = System.currentTimeMillis() / 1000;
-        String randomNumberString = randomNumber.toString();
-        StorageReference imagesReference = storageReference.child("images/" + randomNumberString);
-        imagesReference.putFile(imgUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded image
-                        imagesReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                Uri downloadUrl = uri;
-                                System.out.println("Success url is " + downloadUrl);
-                            }
-                        });
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        // ...
-                        System.out.println("Fail");
-                    }
-                });
+    private void uploadImageToFirebaseStorage() {
+        if(imgUri != null) {
+            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+            FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+            Long randomNumber = System.currentTimeMillis() / 1000;
+            String randomNumberString = randomNumber.toString();
+            StorageReference imagesReference = storageReference.child("images/" + currentUser.getUid() + randomNumberString);
+            imagesReference.putFile(imgUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded image
+                            imagesReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    imageDownloadUrl = uri;
+                                    saveRace();
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            System.out.println("Fail");
+                        }
+                    });
+        }
+        else
+        {
+            saveRace();
+        }
+    }
+
+    private void getCitiesFromApi(String countryName) {
+        CountriesApiService countriesApiService = CountriesApiClient.getCountriesApiClient().create(CountriesApiService.class);
+        Countries countries = new Countries();
+        countries.country = countryName;
+        Call<Cities> citiesCall = countriesApiService.getCities(countries);
+        citiesCall.enqueue(new Callback<Cities>() {
+            @Override
+            public void onResponse(Call<Cities> call, Response<Cities> response) {
+                if (response.isSuccessful()) {
+                    ArrayList<String> citiesList = new ArrayList<>();
+                    Cities cities = response.body();
+                    citiesList.addAll(cities.getData());
+                    adapterCities = new ArrayAdapter(getContext(), android.R.layout.simple_dropdown_item_1line, citiesList);
+                    cityTextView.setAdapter(adapterCities);
+                    cityTextView.setText(adapterCities.getItem(0).toString(), false);
+
+                } else {
+                    Log.d("tag", "works no response");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Cities> call, Throwable t) {
+                Log.d("tag", "works greska " + t);
+            }
+        });
+    }
+
+    private Timestamp getTimestamp() {
+        long dateSeconds = (long) datePicker.getSelection();
+        long hourSeconds = TimeUnit.HOURS.toMillis(timePicker.getHour());
+        long minuteSeconds = TimeUnit.MINUTES.toMillis(timePicker.getMinute());
+        long timeDate = dateSeconds + hourSeconds + minuteSeconds;
+        Date date = new Date(timeDate);
+        Timestamp timestamp = new Timestamp(date);
+        return timestamp;
+    }
+
+    private ArrayList<String> getDistanceFilter() {
+        ArrayList<String> distanceFilter = new ArrayList<>();
+        for (int i = 0; i < categories.size(); i++) {
+            Log.d(TAG, "THIS IS " + categories.get(i));
+            if (!categories.get(i).equals("Marathon") && !categories.get(i).equals("Half-Marathon")) {
+                String distance = categories.get(i).substring(0, categories.get(i).length() - 2);
+                Integer distanceNumber = Integer.valueOf(distance);
+                if (distanceNumber <= 5 && !distanceFilter.contains("1")) {
+                    distanceFilter.add("1");
+                } else if (distanceNumber <= 10 && !distanceFilter.contains("2")) {
+                    distanceFilter.add("2");
+                } else if (distanceNumber <= 21 && !distanceFilter.contains("3")) {
+                    distanceFilter.add("3");
+                } else if (distanceNumber <= 42 && !distanceFilter.contains("4")) {
+                    distanceFilter.add("4");
+                }
+            } else if (categories.get(i).equals("Marathon") && !distanceFilter.contains("4")) {
+                distanceFilter.add("4");
+            } else if (categories.get(i).equals("Half-Marathon") && !distanceFilter.contains("3")) {
+                distanceFilter.add("3");
+            }
+        }
+
+        return distanceFilter;
     }
 }
