@@ -3,11 +3,11 @@ package com.example.runningevents.api;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class CountriesApiClient {
-    public static final String BASE_URL = "https://countriesnow.space/api/v0.1/";
+public class LocationApiClient {
+    public static final String BASE_URL = "http://api.positionstack.com/v1/";
     public static Retrofit retrofit;
 
-    public static Retrofit getCountriesApiClient(){
+    public static Retrofit geLocationApiClient(){
         if (retrofit == null)
         {
             retrofit = new Retrofit.Builder()

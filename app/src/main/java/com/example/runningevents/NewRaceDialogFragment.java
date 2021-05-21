@@ -8,10 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -39,9 +35,14 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.runningevents.api.CountriesApiClient;
 import com.example.runningevents.api.CountriesApiService;
+import com.example.runningevents.api.LocationApiClient;
+import com.example.runningevents.api.LocationApiService;
 import com.example.runningevents.models.Cities;
 import com.example.runningevents.models.Countries;
+import com.example.runningevents.models.Location;
 import com.example.runningevents.models.Race;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -62,15 +63,16 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import org.w3c.dom.Text;
-
 import java.io.File;
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -89,8 +91,6 @@ public class NewRaceDialogFragment extends DialogFragment {
     private Toolbar toolbar;
 
     LinearLayout containerCategories;
-    TextInputLayout inputLayout;
-    AutoCompleteTextView editText;
     ArrayAdapter adapterCategories;
     MaterialButton newCategoryBtn;
 
@@ -121,6 +121,8 @@ public class NewRaceDialogFragment extends DialogFragment {
 
     ArrayList<String> categories = new ArrayList<>();
     HashMap<Integer, String> selectedCategory = new HashMap<>();
+
+    private double lat, lan;
 
 
     public static NewRaceDialogFragment display(FragmentManager fragmentManager) {
@@ -209,8 +211,8 @@ public class NewRaceDialogFragment extends DialogFragment {
         });
 
 
-       // countryInputLayout.getEditText().addTextChangedListener(textWatcher);
-       // dateEditText.addTextChangedListener(textWatcher);
+        // countryInputLayout.getEditText().addTextChangedListener(textWatcher);
+        // dateEditText.addTextChangedListener(textWatcher);
 
 
         return view;
@@ -242,7 +244,9 @@ public class NewRaceDialogFragment extends DialogFragment {
         toolbar.setTitle("Add new race");
         toolbar.inflateMenu(R.menu.menu_new_race);
         toolbar.setOnMenuItemClickListener(item -> {
-           uploadImageToFirebaseStorage();
+            if (isDataValid()) {
+                uploadImageToFirebaseStorage();
+            }
             return true;
         });
     }
@@ -297,11 +301,6 @@ public class NewRaceDialogFragment extends DialogFragment {
             public void run() {
                 try {
                     dialogPickerClicked = true;
-                    if (Looper.myLooper() == Looper.getMainLooper()) {
-                        Log.d(TAG, "i am on main");
-                    } else {
-                        Log.d(TAG, "i am not");
-                    }
                     Log.d("theard counter", "Current thread: " + Thread.activeCount() + " " + Thread.currentThread().getName());
                     CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder().setValidator(DateValidatorPointForward.from(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
                     datePicker = MaterialDatePicker.Builder.datePicker()
@@ -400,74 +399,65 @@ public class NewRaceDialogFragment extends DialogFragment {
     }
 
     private void saveRace() {
-        String raceName = "";
-        String country = "";
-        String city = "";
+        String raceName = raceNameEditText.getText().toString();
+        String country = countryTextView.getText().toString();
+        String city = cityTextView.getText().toString();
+        Timestamp timestamp = getTimestamp();
+        String geohash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(lat, lan));
         String website = "";
-        String imageUrl = "";
-        Timestamp timestamp;
-        if(isDataValid()) {
-            raceName = raceNameEditText.getText().toString();
-            country = countryTextView.getText().toString();
-            city = cityTextView.getText().toString();
-            timestamp = getTimestamp();
-            categories = new ArrayList<String>(selectedCategory.values());
-            if(websiteEditText.getText() != null) {
-                website = websiteEditText.getText().toString();
-            }
-            if(imageDownloadUrl != null) {
-                imageUrl = imageDownloadUrl.toString();
-            }
-
-            //Create race object
-            Race race = new Race();
-            race.setRaceName(raceName);
-            race.setCategories(categories);
-            race.setDistancesFilter(getDistanceFilter());
-            race.setCountry(country);
-            race.setCity(city);
-            race.setDate(timestamp);
-            race.setWebsiteUrl(website);
-            race.setImageUrl(imageUrl);
-
-
-            db.collection("races")
-                    .add(race)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Log.d(TAG, "Race is added");
-                            Toast.makeText(getContext(), "New race is added", Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Error ", e);
-                        }
-                    });
+        if (websiteEditText.getText() != null) {
+            website = websiteEditText.getText().toString();
         }
+        String imageUrl = "";
+        if (imageDownloadUrl != null) {
+            imageUrl = imageDownloadUrl.toString();
+        }
+        categories = new ArrayList<String>(selectedCategory.values());
+
+        //Create race object
+        Race race = new Race();
+        race.setRaceName(raceName);
+        race.setCategories(categories);
+        race.setDistancesFilter(getDistanceFilter());
+        race.setCountry(country);
+        race.setCity(city);
+        race.setDate(timestamp);
+        race.setWebsiteUrl(website);
+        race.setImageUrl(imageUrl);
+        race.setLatitude(lat);
+        race.setLongitude(lan);
+        race.setGeohash(geohash);
+
+
+        db.collection("races")
+                .add(race)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "Race is added");
+                        Toast.makeText(getContext(), "New race is added", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "Error ", e);
+                    }
+                });
     }
 
-    private boolean isDataValid(){
-        if(raceNameEditText.getText().length() <5){
+    private boolean isDataValid() {
+        if (raceNameEditText.getText().length() < 5) {
             return false;
-        }
-        else if(countryTextView.getText() == null){
+        } else if (countryTextView.getText() == null) {
             return false;
-        }
-        else if(cityTextView.getText() == null)
-        {
+        } else if (cityTextView.getText() == null) {
             return false;
-        }
-        else if(dateEditText.getText() == null)
-        {
+        } else if (dateEditText.getText() == null) {
             return false;
-        }
-        else if(timeEditText.getText() == null){
+        } else if (timeEditText.getText() == null) {
             return false;
-        }
-        else if(selectedCategory.size() <= 0){
+        } else if (selectedCategory.size() <= 0) {
             return false;
         }
         return true;
@@ -479,15 +469,15 @@ public class NewRaceDialogFragment extends DialogFragment {
                 ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         margins.topMargin = 10;
         view.setLayoutParams(margins);
+        TextInputLayout inputLayout;
+        AutoCompleteTextView editText;
+        Button delete;
 
-        Button delete = view.findViewById(R.id.deleteBtn);
-
+        delete = view.findViewById(R.id.deleteBtn);
         inputLayout = view.findViewById(R.id.inputLayout);
         editText = view.findViewById(R.id.inputText);
         editText.setAdapter(adapterCategories);
 
-
-//        editText.setText(adapter.getItem(0).toString(), false);
 
         ((AutoCompleteTextView) inputLayout.getEditText()).setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -560,7 +550,7 @@ public class NewRaceDialogFragment extends DialogFragment {
     }
 
     private void uploadImageToFirebaseStorage() {
-        if(imgUri != null) {
+        if (imgUri != null) {
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
             FirebaseUser currentUser = firebaseAuth.getCurrentUser();
             Long randomNumber = System.currentTimeMillis() / 1000;
@@ -575,7 +565,7 @@ public class NewRaceDialogFragment extends DialogFragment {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     imageDownloadUrl = uri;
-                                    saveRace();
+                                    getLocationLatAndLan(cityTextView.getText() + " , " + countryTextView.getText());
                                 }
                             });
                         }
@@ -586,10 +576,9 @@ public class NewRaceDialogFragment extends DialogFragment {
                             System.out.println("Fail");
                         }
                     });
-        }
-        else
-        {
-            saveRace();
+        } else {
+            //no image selected
+            getLocationLatAndLan(cityTextView.getText() + " , " + countryTextView.getText());
         }
     }
 
@@ -617,6 +606,31 @@ public class NewRaceDialogFragment extends DialogFragment {
             @Override
             public void onFailure(Call<Cities> call, Throwable t) {
                 Log.d("tag", "works greska " + t);
+            }
+        });
+    }
+
+    private void getLocationLatAndLan(String locationName) {
+        LocationApiService locationApiService = LocationApiClient.geLocationApiClient().create(LocationApiService.class);
+        Call<Location> locationCall = locationApiService.getLatAndLan("675ab978e69bc6f658ab3ca38fea85ca", locationName);
+        locationCall.enqueue(new Callback<Location>() {
+            @Override
+            public void onResponse(Call<Location> call, Response<Location> response) {
+                if (response.isSuccessful()) {
+                    // Location location = response.body();
+                    List<Location.LocationData> locationData = response.body().getData();
+                    lat = locationData.get(0).getLatitude();
+                    lan = locationData.get(0).getLongitude();
+                    Log.d(TAG, "works fine");
+                    saveRace();
+                } else {
+                    Log.d(TAG, "works greska");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Location> call, Throwable t) {
+                Log.d(TAG, "No response");
             }
         });
     }
@@ -655,5 +669,35 @@ public class NewRaceDialogFragment extends DialogFragment {
         }
 
         return distanceFilter;
+    }
+
+    private final class TaskGetLocation extends AsyncTask<String, Integer, String> {
+        List<Location.LocationData> locationData;
+
+        @Override
+        protected String doInBackground(String... params) {
+            LocationApiService locationApiService = LocationApiClient.geLocationApiClient().create(LocationApiService.class);
+            Call<Location> locationCall = locationApiService.getLatAndLan("675ab978e69bc6f658ab3ca38fea85ca", "prilep");
+            locationCall.enqueue(new Callback<Location>() {
+                @Override
+                public void onResponse(Call<Location> call, Response<Location> response) {
+                    if (response.isSuccessful()) {
+                        // Location location = response.body();
+                        locationData = response.body().getData();
+                        lat = locationData.get(0).getLatitude();
+                        lan = locationData.get(0).getLongitude();
+                        System.out.println("Location 0 " + lat + ":" + lan);
+                    } else {
+                        Log.d(TAG, "works greska");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Location> call, Throwable t) {
+                    Log.d(TAG, "No response");
+                }
+            });
+            return null;
+        }
     }
 }
