@@ -1,4 +1,4 @@
-package com.example.runningevents;
+package com.example.runningevents.Main;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -33,6 +33,8 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.runningevents.BuildConfig;
+import com.example.runningevents.R;
 import com.example.runningevents.api.CountriesApiClient;
 import com.example.runningevents.api.CountriesApiService;
 import com.example.runningevents.api.LocationApiClient;
@@ -64,7 +66,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +73,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -609,10 +609,10 @@ public class NewRaceDialogFragment extends DialogFragment {
             }
         });
     }
-
+//675ab978e69bc6f658ab3ca38fea85ca
     private void getLocationLatAndLan(String locationName) {
         LocationApiService locationApiService = LocationApiClient.geLocationApiClient().create(LocationApiService.class);
-        Call<Location> locationCall = locationApiService.getLatAndLan("675ab978e69bc6f658ab3ca38fea85ca", locationName);
+        Call<Location> locationCall = locationApiService.getLatAndLan(BuildConfig.LOCATION_API_KEY, locationName);
         locationCall.enqueue(new Callback<Location>() {
             @Override
             public void onResponse(Call<Location> call, Response<Location> response) {
@@ -669,35 +669,5 @@ public class NewRaceDialogFragment extends DialogFragment {
         }
 
         return distanceFilter;
-    }
-
-    private final class TaskGetLocation extends AsyncTask<String, Integer, String> {
-        List<Location.LocationData> locationData;
-
-        @Override
-        protected String doInBackground(String... params) {
-            LocationApiService locationApiService = LocationApiClient.geLocationApiClient().create(LocationApiService.class);
-            Call<Location> locationCall = locationApiService.getLatAndLan("675ab978e69bc6f658ab3ca38fea85ca", "prilep");
-            locationCall.enqueue(new Callback<Location>() {
-                @Override
-                public void onResponse(Call<Location> call, Response<Location> response) {
-                    if (response.isSuccessful()) {
-                        // Location location = response.body();
-                        locationData = response.body().getData();
-                        lat = locationData.get(0).getLatitude();
-                        lan = locationData.get(0).getLongitude();
-                        System.out.println("Location 0 " + lat + ":" + lan);
-                    } else {
-                        Log.d(TAG, "works greska");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Location> call, Throwable t) {
-                    Log.d(TAG, "No response");
-                }
-            });
-            return null;
-        }
     }
 }

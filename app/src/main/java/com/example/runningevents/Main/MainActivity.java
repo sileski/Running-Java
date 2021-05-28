@@ -1,15 +1,15 @@
-package com.example.runningevents;
+package com.example.runningevents.Main;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.view.View;
 
-import com.google.android.material.datepicker.MaterialDatePicker;
+import com.example.runningevents.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -34,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
         {
            // floatingActionButton.hide();
         }
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.fragmentContainer, new RacesFragment(), "races");
+        transaction.addToBackStack(null);
+        transaction.commit();
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override

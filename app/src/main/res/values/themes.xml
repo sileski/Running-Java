@@ -32,13 +32,14 @@
     <!-- Add new race dialog theme -->
     <style name="Theme.NewRaceDialog" parent="Theme.MaterialComponents.Light.Dialog">
         <item name="colorAccent">@color/green</item>
-        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimary">@color/green_500</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/white</item>
         <item name="actionMenuTextColor">@color/white</item>
-        <item name="android:statusBarColor" tools:targetApi="l">@color/blue</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/green_500</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
     </style>
+
     <style name="Theme.RunningEvents.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -53,6 +54,7 @@
         <item name="android:windowEnterAnimation">@anim/slide_up</item>
         <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
+
 
     <style name="Theme.RunningEvents.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

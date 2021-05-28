@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.runningevents.adapters.LoginViewPagerAdapter;
-import com.example.runningevents.MainActivity;
+import com.example.runningevents.Main.MainActivity;
 import com.example.runningevents.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -62,9 +62,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().getDecorView().getWindowInsetsController().setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
-        }
 
         firebaseAuth = FirebaseAuth.getInstance();
 
