@@ -1,29 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="11dp"
-    android:layout_marginRight="11dp"
     android:layout_marginTop="7dp"
+    android:layout_marginRight="11dp"
     android:layout_marginBottom="7dp"
-    app:cardElevation="10dp"
     app:cardCornerRadius="10dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    app:cardElevation="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#00E61414">
 
-        <ImageView
-            android:id="@+id/raceImage"
+        <RelativeLayout
+            android:id="@+id/raceImageLayout"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            android:scaleType="centerCrop"
-            android:transitionName="img"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/raceImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:transitionName="img" />
+
+            <ProgressBar
+                android:id="@+id/progress_load_image"
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/raceName"
@@ -31,11 +44,11 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp"
-            app:layout_constraintTop_toBottomOf="@id/raceImage"
-            app:layout_constraintStart_toStartOf="parent"
             android:text="TEST RACE"
             android:textSize="17sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/raceImageLayout" />
 
         <LinearLayout
             android:id="@+id/location"
@@ -45,19 +58,21 @@
             android:layout_marginTop="5dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/raceName">
+
             <ImageView
                 android:id="@+id/locationIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_locaction"/>
+                android:src="@drawable/ic_locaction" />
+
             <TextView
                 android:id="@+id/locationName"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="15sp"
-                android:text="Macedonia, Prilep"
+                android:layout_marginLeft="5dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="5dp"/>
+                android:text="Macedonia, Prilep"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -68,19 +83,21 @@
             android:layout_marginTop="5dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/location">
+
             <ImageView
                 android:id="@+id/dateIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_date"/>
+                android:src="@drawable/ic_date" />
+
             <TextView
                 android:id="@+id/raceDate"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="15sp"
-                android:text="Monday, 23 December, 2021"
+                android:layout_marginLeft="5dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="5dp"/>
+                android:text="Monday, 23 December, 2021"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -91,19 +108,21 @@
             android:layout_marginTop="5dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/date">
+
             <ImageView
                 android:id="@+id/timeIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_time"/>
+                android:src="@drawable/ic_time" />
+
             <TextView
                 android:id="@+id/raceTime"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="15sp"
-                android:text="10:00 PM"
+                android:layout_marginLeft="5dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="5dp"/>
+                android:text="10:00 PM"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -114,21 +133,23 @@
             android:layout_marginTop="5dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/time">
+
             <ImageView
                 android:id="@+id/distanceIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_distance"/>
+                android:src="@drawable/ic_distance" />
+
             <TextView
                 android:id="@+id/raceDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:text=""
-                android:gravity="center_vertical"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_marginBottom="5dp"/>
+                android:layout_marginBottom="5dp"
+                android:gravity="center_vertical"
+                android:text=""
+                android:textSize="15sp" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

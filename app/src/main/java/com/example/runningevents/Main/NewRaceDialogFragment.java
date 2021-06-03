@@ -417,6 +417,7 @@ public class NewRaceDialogFragment extends DialogFragment {
         //Create race object
         Race race = new Race();
         race.setRaceName(raceName);
+        race.setRaceNameLowercase(raceName.toLowerCase());
         race.setCategories(categories);
         race.setDistancesFilter(getDistanceFilter());
         race.setCountry(country);

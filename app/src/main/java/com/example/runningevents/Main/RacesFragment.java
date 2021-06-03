@@ -1,16 +1,25 @@
 package com.example.runningevents.Main;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.runningevents.R;
 import com.example.runningevents.adapters.RacesRecyclerViewAdapter;
@@ -29,6 +38,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static android.content.Context.SEARCH_SERVICE;
 
 public class RacesFragment extends Fragment {
 
@@ -61,8 +72,9 @@ public class RacesFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        racesRecyclerView = view.findViewById(R.id.racesRecycleView);
+        setHasOptionsMenu(true);
 
+        racesRecyclerView = view.findViewById(R.id.racesRecycleView);
 
         // set up the RecyclerView
         LinearLayoutManager mLayoutManager;
@@ -90,17 +102,38 @@ public class RacesFragment extends Fragment {
                 }
             }
         });
-
         return view;
     }
 
-    private void getRaces(){
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_races, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+        item.setActionView(searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchRaces(query.toLowerCase());
+                Toast.makeText(getContext(), "You searched for " + query, Toast.LENGTH_LONG).show();
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    private void getRaces() {
 
     }
 
     private void getRacesByDate() {
         List<Race> racesList = new ArrayList<>();
-        if(lastItemReached == false) {
+        if (lastItemReached == false) {
             CollectionReference collectionReference = db.collection("races");
             Query query;
             Timestamp timestampNow = Timestamp.now();
@@ -147,5 +180,27 @@ public class RacesFragment extends Fragment {
 
     private void getRacesByLocation() {
 
+    }
+
+    private void searchRaces(String raceName){
+        List<Race> racesList = new ArrayList<>();
+        CollectionReference collectionReference = db.collection("races");
+        Query query;
+        Timestamp timestampNow = Timestamp.now();
+        query = collectionReference.orderBy("raceNameLowercase").orderBy("date", Query.Direction.ASCENDING).startAt(raceName,timestampNow).endAt(raceName+"\uf8ff").limit(5);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                        Race race = documentSnapshot.toObject(Race.class);
+                        racesList.add(race);
+                    }
+                    racesAdapter = new RacesRecyclerViewAdapter(getContext(), racesList);
+                    racesAdapter.notifyDataSetChanged();
+                    racesRecyclerView.setAdapter(racesAdapter);
+                }
+            }
+        });
     }
 }

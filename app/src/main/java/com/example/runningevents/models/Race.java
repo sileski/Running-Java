@@ -8,6 +8,8 @@ public class Race {
 
     private String raceName;
 
+    private String raceNameLowercase;
+
     private String country;
 
     private String city;
@@ -34,6 +36,14 @@ public class Race {
 
     public void setRaceName(String raceName) {
         this.raceName = raceName;
+    }
+
+    public String getRaceNameLowercase() {
+        return raceNameLowercase;
+    }
+
+    public void setRaceNameLowercase(String raceNameLowercase) {
+        this.raceNameLowercase = raceNameLowercase;
     }
 
     public String getCountry() {
