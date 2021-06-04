@@ -24,9 +24,14 @@ import android.widget.Toast;
 import com.example.runningevents.R;
 import com.example.runningevents.adapters.RacesRecyclerViewAdapter;
 import com.example.runningevents.models.Race;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQueryBounds;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -53,6 +58,8 @@ public class RacesFragment extends Fragment {
     RacesRecyclerViewAdapter racesAdapter;
     boolean loadingNewRaces = true;
     int pastVisibleItems, visibleItemCount, totalItemCount;
+
+    FusedLocationProviderClient fusedLocationProviderClient;
 
 
     public RacesFragment() {
@@ -81,7 +88,8 @@ public class RacesFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(view.getContext());
         racesRecyclerView.setLayoutManager(mLayoutManager);
 
-        getRacesByDate();
+        //getRacesByDate();
+        getRacesByLocation();
 
         racesRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -94,7 +102,8 @@ public class RacesFragment extends Fragment {
 
                     if (loadingNewRaces == true) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                            getRacesByDate();
+                            // getRacesByDate();
+                            getRacesByLocation();
                             loadingNewRaces = false;
                             Log.d("Paggination", "Works");
                         }
@@ -120,6 +129,7 @@ public class RacesFragment extends Fragment {
                 Toast.makeText(getContext(), "You searched for " + query, Toast.LENGTH_LONG).show();
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -179,15 +189,86 @@ public class RacesFragment extends Fragment {
     }
 
     private void getRacesByLocation() {
+        List<Race> racesList = new ArrayList<>();
+        if (lastItemReached == false) {
+            CollectionReference collectionReference = db.collection("races");
+            final GeoLocation center = new GeoLocation(41.34514, 21.55504);
+            final double radiusInM = 5000 * 1000;
 
+            Timestamp timestampNow = Timestamp.now();
+            List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(center, radiusInM);
+            final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+            for (GeoQueryBounds b : bounds) {
+                Query query;
+                if (lastVisible == null) {
+                    query = collectionReference
+                            .orderBy("geohash")
+                            .orderBy("date", Query.Direction.ASCENDING)
+                            .startAt(b.startHash, timestampNow)
+                            .endAt(b.endHash)
+                            .limit(3);
+                } else {
+                    query = collectionReference
+                            .orderBy("geohash")
+                            .orderBy("date", Query.Direction.ASCENDING)
+                            .startAt(b.startHash, timestampNow)
+                            .endAt(b.endHash)
+                            .startAfter(lastVisible)
+                            .limit(limit);
+                }
+
+                tasks.add(query.get());
+            }
+
+            Tasks.whenAllComplete(tasks)
+                    .addOnCompleteListener(new OnCompleteListener<List<Task<?>>>() {
+                        @Override
+                        public void onComplete(@NonNull Task<List<Task<?>>> t) {
+                            if (t.isSuccessful()) {
+                                List<DocumentSnapshot> matchingDocs = new ArrayList<>();
+                                QuerySnapshot snap = null;
+                                for (Task<QuerySnapshot> task : tasks) {
+                                    snap = task.getResult();
+                                    for (DocumentSnapshot doc : snap.getDocuments()) {
+                                        double lat = doc.getDouble("latitude");
+                                        double lng = doc.getDouble("longitude");
+
+                                        // We have to filter out a few false positives due to GeoHash
+                                        // accuracy, but most will match
+                                        GeoLocation docLocation = new GeoLocation(lat, lng);
+                                        double distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center);
+                                        if (distanceInM <= radiusInM) {
+                                            Race race = doc.toObject(Race.class);
+                                            racesList.add(race);
+                                        }
+                                    }
+                                }
+                                if (lastVisible == null) {
+                                    racesAdapter = new RacesRecyclerViewAdapter(getContext(), racesList);
+                                    racesRecyclerView.setAdapter(racesAdapter);
+                                } else {
+                                    racesAdapter.addItem(racesList);
+                                    loadingNewRaces = true;
+                                }
+
+                                if (snap.size() < limit) {
+                                    lastItemReached = true;
+                                } else {
+                                    lastVisible = snap.getDocuments().get(snap.size() - 1);
+                                }
+                            }
+                        }
+                    });
+        }
     }
 
-    private void searchRaces(String raceName){
+
+    private void searchRaces(String raceName) {
         List<Race> racesList = new ArrayList<>();
         CollectionReference collectionReference = db.collection("races");
         Query query;
         Timestamp timestampNow = Timestamp.now();
-        query = collectionReference.orderBy("raceNameLowercase").orderBy("date", Query.Direction.ASCENDING).startAt(raceName,timestampNow).endAt(raceName+"\uf8ff").limit(5);
+        query = collectionReference.orderBy("raceNameLowercase").orderBy("date", Query.Direction.ASCENDING).startAt(raceName, timestampNow).endAt(raceName + "\uf8ff").limit(5);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
