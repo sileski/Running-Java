@@ -3,7 +3,6 @@
     package="com.example.runningevents">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
@@ -12,13 +11,17 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RunningEvents"
+        android:theme="@style/Theme.RunningEvents.NoActionBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".FiltersPreferencesActivity"
+            android:theme="@style/Theme.RunningEvents.Filters">
+        </activity>
+        <activity android:name=".RaceDetailsActivity" />
         <activity
             android:name=".Login.activities.ForgotPasswordActivity"
             android:label="@string/reset_password"
-            android:theme="@style/Theme.RunningEvents.ForgotPassword"
-            android:parentActivityName=".Login.activities.LoginActivity"></activity>
+            android:parentActivityName=".Login.activities.LoginActivity"
+            android:theme="@style/Theme.RunningEvents.ForgotPassword" />
         <activity
             android:name=".Login.activities.LoginActivity"
             android:windowSoftInputMode="adjustPan">
@@ -28,15 +31,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Main.MainActivity">
-        </activity>
+        <activity android:name=".Main.MainActivity" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
     </application>
 
 </manifest>

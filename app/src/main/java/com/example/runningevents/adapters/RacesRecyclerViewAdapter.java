@@ -32,6 +32,7 @@ import com.example.runningevents.models.Race;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -39,8 +40,9 @@ import java.util.logging.Handler;
 
 public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecyclerViewAdapter.ViewHolder> {
 
-    Context context;
-    List<Race> raceList;
+    private Context context;
+    private List<Race> raceList;
+    private OnItemClickListener onItemClickListener;
 
     public RacesRecyclerViewAdapter(Context context, List<Race> raceList) {
         this.context = context;
@@ -76,19 +78,21 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
 
         //Categories
         ArrayList<String> categories =raceList.get(position).getCategories();
+
         if(categories.size() > 0) {
+            Collections.sort(categories);
             holder.raceCategories.setText("");
             for (int i = 0; i < categories.size(); i++) {
                 if(categories.get(i).equals("Marathon"))
                 {
                     Spannable spannable = new SpannableString(categories.get(i) + " ");
-                    spannable.setSpan(new ForegroundColorSpan(Color.GREEN), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_red)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     holder.raceCategories.append(spannable);
                 }
                 else if(categories.get(i).equals("Half-Marathon"))
                 {
                     Spannable spannable = new SpannableString(categories.get(i) + " ");
-                    spannable.setSpan(new ForegroundColorSpan(Color.RED), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_purple)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     holder.raceCategories.append(spannable);
                 }
                 else{
@@ -96,22 +100,22 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
                     int distance = Integer.valueOf(temp);
                     if(distance <= 5) {
                         Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(Color.MAGENTA), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_gold)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         holder.raceCategories.append(spannable);
                     }
                     else if(distance <= 10){
                         Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(Color.LTGRAY), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_blue)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         holder.raceCategories.append(spannable);
                     }
                     else if(distance <= 21){
                         Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(Color.CYAN), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_purple)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         holder.raceCategories.append(spannable);
                     }
                     else {
                         Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(Color.RED), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_red)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         holder.raceCategories.append(spannable);
                     }
 
@@ -145,8 +149,6 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
                 })
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.raceImage);
-
-
     }
 
     @Override
@@ -154,13 +156,29 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
         return raceList.size();
     }
 
+    public Race getItem(int position){
+        return raceList.get(position);
+    }
+
     public void addItem(List<Race> races) {
         raceList.addAll(races);
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        int size = raceList.size();
+        if(size > 0) {
+            raceList.clear();
+            notifyItemRangeRemoved(0, size);
+        }
+    }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
+    }
+
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView raceName;
         TextView raceDate;
         TextView raceTime;
@@ -178,6 +196,16 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
             raceCategories = itemView.findViewById(R.id.raceDistance);
             raceImage = itemView.findViewById(R.id.raceImage);
             progressLoadImage = itemView.findViewById(R.id.progress_load_image);
+           itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            onItemClickListener.onItemClick(v, getAdapterPosition());
+        }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
     }
 }

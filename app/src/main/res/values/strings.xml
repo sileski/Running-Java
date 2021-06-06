@@ -22,6 +22,14 @@
     <string name="category">Category</string>
     <string name="categories">Categories</string>
     <string name="website">Website</string>
+    <string name="nearby">Nearby</string>
+    <string name="sort">Sort</string>
+    <string name="all">All</string>
+    <string name="five_km">5km</string>
+    <string name="ten_km">10km</string>
+    <string name="half_marathon">Half-Marathon</string>
+    <string name="marathon">Marathon</string>
+    <string name="races_distance">Races distance</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

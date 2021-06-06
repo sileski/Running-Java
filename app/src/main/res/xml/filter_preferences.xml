@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Races">
+        <ListPreference
+            android:dialogTitle="Sort"
+            android:key="races_sort"
+            android:title="@string/sort"
+            android:entries="@array/races_sort__entries"
+            android:entryValues="@array/races_sort_values"
+            android:useSimpleSummaryProvider="true"
+            android:defaultValue="date"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/races_distance">
+        <CheckBoxPreference
+            android:title="@string/all"
+            android:key="distance_all"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:title="@string/five_km"
+            android:key="distance_5km"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:title="@string/ten_km"
+            android:defaultValue="false"
+            android:key="distance_10km"/>
+        <CheckBoxPreference
+            android:title="@string/half_marathon"
+            android:defaultValue="false"
+            android:key="distance_half"/>
+        <CheckBoxPreference
+            android:title="@string/marathon"
+            android:defaultValue="false"
+            android:key="distance_marathon"/>
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

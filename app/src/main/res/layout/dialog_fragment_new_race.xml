@@ -19,7 +19,7 @@
             android:layout_height="?attr/actionBarSize"
             android:paddingStart="6dp"
             android:paddingEnd="16dp"
-            android:theme="@style/Toolbar_New_Race"
+            android:theme="@style/Toolbar_Icon_Color"
             app:contentInsetStartWithNavigation="0dp"
             app:navigationIcon="@drawable/ic_close"
             app:titleTextColor="@color/white" />

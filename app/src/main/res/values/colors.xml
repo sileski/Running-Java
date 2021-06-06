@@ -11,4 +11,9 @@
     <color name="blue">#00BCD4</color>
     <color name="green_500">#4CAF50</color>
     <color name="green">#63BC51</color>
+
+    <color name="category_gold">#FF9800</color>
+    <color name="category_blue">#2979FF</color>
+    <color name="category_purple">#9C27B0</color>
+    <color name="category_red">#D32F2F</color>
 </resources>

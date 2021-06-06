@@ -1,6 +1,7 @@
 package com.example.runningevents.Main;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -17,12 +18,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.runningevents.R;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     FirebaseAuth firebaseAuth;
     FloatingActionButton floatingActionButton;
@@ -46,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+        {
+            actionBar.setTitle("Custom Toolbar");
+        }
 
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser.isAnonymous() == true)
