@@ -13,9 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RunningEvents.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".FiltersPreferencesActivity"
-            android:theme="@style/Theme.RunningEvents.Filters">
-        </activity>
+        <activity
+            android:name=".FiltersPreferencesActivity"
+            android:theme="@style/Theme.RunningEvents.Filters"></activity>
         <activity android:name=".RaceDetailsActivity" />
         <activity
             android:name=".Login.activities.ForgotPasswordActivity"
@@ -32,6 +32,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".Main.MainActivity" />
+
+        <service
+            android:name=".FirebaseNotificationsService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

@@ -9,7 +9,7 @@
             android:title="@string/sort"
             android:entries="@array/races_sort__entries"
             android:entryValues="@array/races_sort_values"
-            android:useSimpleSummaryProvider="true"
+            app:useSimpleSummaryProvider="true"
             android:defaultValue="date"/>
     </PreferenceCategory>
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +15,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.runningevents.db.RaceData;
+import com.example.runningevents.db.RoomDb;
 import com.example.runningevents.models.Race;
 import com.google.gson.Gson;
 
@@ -21,6 +24,7 @@ public class RaceDetailsActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     ImageView raceImage;
+    Race race;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +40,7 @@ public class RaceDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Gson gson = new Gson();
-        Race race = gson.fromJson(getIntent().getStringExtra("race"), Race.class);
-        Toast.makeText(getApplicationContext(), race.getRaceName(), Toast.LENGTH_LONG).show();
+        race = gson.fromJson(getIntent().getStringExtra("race"), Race.class);
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.error(Utils.getRandomDrawableColor());
@@ -58,7 +61,7 @@ public class RaceDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.save_favorite:
-                Toast.makeText(getApplicationContext(),"race saved", Toast.LENGTH_LONG).show();
+                saveRaceInDatabase();
                 return true;
 
             default:
@@ -70,5 +73,19 @@ public class RaceDetailsActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    private void saveRaceInDatabase(){
+        RoomDb roomDb = RoomDb.getInstance(this.getApplicationContext());
+        RaceData raceData = new RaceData();
+        raceData.setRaceName(race.getRaceName());
+        raceData.setCity(race.getCity());
+        raceData.setCountry(race.getCountry());
+        Long timestamp = race.getDate().getSeconds();
+        raceData.setTimestamp(timestamp);
+        raceData.setImageUrl(raceData.getImageUrl());
+        raceData.setCategories(race.getCategories());
+
+        roomDb.raceDao().insert(raceData);
     }
 }

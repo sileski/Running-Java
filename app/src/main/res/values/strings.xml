@@ -30,6 +30,8 @@
     <string name="half_marathon">Half-Marathon</string>
     <string name="marathon">Marathon</string>
     <string name="races_distance">Races distance</string>
+    <string name="races">Races</string>
+    <string name="saved">Saved</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
