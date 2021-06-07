@@ -11,8 +11,10 @@ import android.app.FragmentManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 
 import com.example.runningevents.R;
 import com.example.runningevents.SavedRacesFragment;
+import com.example.runningevents.SettingsPreferencesFragment;
+import com.example.runningevents.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
@@ -63,9 +67,9 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser.isAnonymous() == true)
+        if (currentUser.isAnonymous())
         {
-           // floatingActionButton.hide();
+           floatingActionButton.hide();
         }
 
 
@@ -121,9 +125,14 @@ public class MainActivity extends AppCompatActivity  {
                         case R.id.saved:
                             selectedFragment = new SavedRacesFragment();
                             break;
+
+                        case R.id.settings:
+                            selectedFragment = new SettingsPreferencesFragment();
+                            break;
                     }
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selectedFragment).commit();
                     return true;
                 }
             };
+
 }

@@ -7,10 +7,15 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 public class FiltersPreferencesActivity extends AppCompatActivity {
 

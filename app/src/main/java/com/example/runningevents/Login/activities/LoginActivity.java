@@ -6,12 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.runningevents.Utils;
 import com.example.runningevents.adapters.LoginViewPagerAdapter;
 import com.example.runningevents.Main.MainActivity;
 import com.example.runningevents.R;
@@ -43,7 +46,7 @@ import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG_LOGIN = "LOGIN_ACTIVITY";
-    private static final int GOOGLE_LOGIN = 100;
+    private static final int GOOGLE_LOGIN = 500;
     TabLayout loginTabLayout;
     ViewPager2 loginViewPager;
     LoginViewPagerAdapter loginViewPagerAdapter;
@@ -104,8 +107,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-        //disable swipe scroll
-        //loginViewPager.setUserInputEnabled(false);
 
         loginAnonymousBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG_LOGIN, "signInAnonymously:success");
                             FirebaseUser user = firebaseAuth.getCurrentUser();
+                            startMainActivity();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG_LOGIN, "signInAnonymously:failure", task.getException());
@@ -163,13 +165,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        loadLanguage();
         if (currentUser != null) {
-            // reload();
-           Toast.makeText(getApplicationContext(), "User is already logged " + currentUser.getDisplayName(), Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
+            startMainActivity();
         }
     }
 
@@ -181,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
         //for facebook login
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
+        //for google login
         if (requestCode == GOOGLE_LOGIN && resultCode == RESULT_OK) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
@@ -203,6 +203,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d(TAG_LOGIN, "signInWithCredential:success");
                             FirebaseUser user = firebaseAuth.getCurrentUser();
+                            startMainActivity();
                         } else {
                             Log.w(TAG_LOGIN, "signInWithCredential:failure", task.getException());
                         }
@@ -218,11 +219,23 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG_LOGIN, "signInWithCredential:success");
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            startMainActivity();
                         } else {
                             Log.w(TAG_LOGIN, "signInWithCredential:failure", task.getException());
                         }
                     }
                 });
+    }
+
+    public void startMainActivity(){
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void loadLanguage(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String language = prefs.getString("select_language", "en");
+        Log.d("Selected language is ", "selected is " + language);
+        Utils.setAppLocale(language, getResources());
     }
 }

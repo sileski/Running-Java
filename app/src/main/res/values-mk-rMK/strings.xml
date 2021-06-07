@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RunningEvents</string>
+    <string name="signup">Регистрирај се</string>
+    <string name="login" translatable="false">Најави се</string>
+    <string name="e_mail">Е-маил</string>
+    <string name="full_name">Целосно име</string>
+    <string name="password">Лозинка</string>
+    <string name="password_confirm">Потврди ја лозинката</string>
+    <string name="forgot_password">Ја заборави лозинката?</string>
+    <string name="reset_password">Ресетирајте ја лозинката</string>
+    <string name="continue_without_registration">Продолжи без регистрација</string>
+    <string name="email_not_valid">Е-маил адресата не е валидна</string>
+    <string name="password_to_short">Лозинката е прекратка</string>
+    <string name="race_name">Име на трката</string>
+    <string name="country">Држава</string>
+    <string name="city">Град</string>
+    <string name="date">Датум</string>
+    <string name="time">Време</string>
+    <string name="signin">Најави се</string>
+    <string name="category">Категорија</string>
+    <string name="categories">Категори</string>
+    <string name="website">Веб страна</string>
+    <string name="nearby">Во близина</string>
+    <string name="sort">Сортирај</string>
+    <string name="all">Сите</string>
+    <string name="five_km">5км</string>
+    <string name="ten_km">10км</string>
+    <string name="half_marathon">Полумаратон</string>
+    <string name="marathon">Маратон</string>
+    <string name="remove_race">Избриши ја трката</string>
+    <string name="saved">Зачувани</string>
+    <string name="races">Трки</string>
+    <string name="remove">Избриши</string>
+    <string name="cancel">Откажи</string>
+    <string name="enter_name">Внеси име</string>
+    <string name="language">Јазик</string>
+</resources>

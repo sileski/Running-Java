@@ -26,6 +26,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.runningevents.R;
 import com.example.runningevents.Utils;
 import com.example.runningevents.db.RaceData;
+import com.example.runningevents.models.Race;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,7 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
 
     private Context context;
     private List<RaceData> savedRaceList;
+    private OnItemClickListener onItemClickListener;
 
     public SavedRacesRecyclerViewAdapter(Context context, List<RaceData> savedRaceList){
         this.context = context;
@@ -142,7 +144,15 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
         return savedRaceList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public RaceData getItem(int position){
+        return savedRaceList.get(position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView raceName;
         TextView raceDate;
         TextView raceTime;
@@ -157,6 +167,17 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
             raceLocation = itemView.findViewById(R.id.locationName);
             raceImage = itemView.findViewById(R.id.raceImage);
             raceCategories = itemView.findViewById(R.id.raceDistance);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            onItemClickListener.onItemClick(v, getAdapterPosition());
         }
     }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
 }

@@ -32,6 +32,19 @@
     <string name="races_distance">Races distance</string>
     <string name="races">Races</string>
     <string name="saved">Saved</string>
+    <string name="remove_race">Remove Race</string>
+    <string name="remove_race_message">"Are you sure you want to remove the selected race from your saved races list?</string>
+    <string name="remove">Remove</string>
+    <string name="cancel">Cancel</string>
+    <string name="password_helper_message">Between 8 and 30 characters and must contain at least one special character</string>
+    <string name="invalid_email">Invalid e-mail</string>
+    <string name="enter_name">Enter name</string>
+    <string name="passwords_dont_match">Passwords don\'t match</string>
+    <string name="language">Language</string>
+    <string name="logout">Log out</string>
+    <string name="english">English</string>
+    <string name="macedonian">Macedonian</string>
+    <string name="settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

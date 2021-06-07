@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 public class Race {
 
+    private String raceId;
+
     private String raceName;
 
     private String raceNameLowercase;
@@ -30,6 +32,14 @@ public class Race {
     private double longitude;
 
     private String geohash;
+
+    public String getRaceId() {
+        return raceId;
+    }
+
+    public void setRaceId(String raceId) {
+        this.raceId = raceId;
+    }
 
     public String getRaceName() {
         return raceName;

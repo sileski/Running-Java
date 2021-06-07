@@ -59,6 +59,7 @@ import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -301,7 +302,6 @@ public class NewRaceDialogFragment extends DialogFragment {
             public void run() {
                 try {
                     dialogPickerClicked = true;
-                    Log.d("theard counter", "Current thread: " + Thread.activeCount() + " " + Thread.currentThread().getName());
                     CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder().setValidator(DateValidatorPointForward.from(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
                     datePicker = MaterialDatePicker.Builder.datePicker()
                             .setTitleText("Select date")
@@ -414,8 +414,15 @@ public class NewRaceDialogFragment extends DialogFragment {
         }
         categories = new ArrayList<String>(selectedCategory.values());
 
+        //Random race id
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        Long randomNumber = System.currentTimeMillis() / 1000;
+        String raceId = currentUser.getUid() + randomNumber.toString();
+
         //Create race object
         Race race = new Race();
+        race.setRaceId(raceId);
         race.setRaceName(raceName);
         race.setRaceNameLowercase(raceName.toLowerCase());
         race.setCategories(categories);
@@ -610,7 +617,7 @@ public class NewRaceDialogFragment extends DialogFragment {
             }
         });
     }
-//675ab978e69bc6f658ab3ca38fea85ca
+
     private void getLocationLatAndLan(String locationName) {
         LocationApiService locationApiService = LocationApiClient.geLocationApiClient().create(LocationApiService.class);
         Call<Location> locationCall = locationApiService.getLatAndLan(BuildConfig.LOCATION_API_KEY, locationName);
@@ -618,7 +625,6 @@ public class NewRaceDialogFragment extends DialogFragment {
             @Override
             public void onResponse(Call<Location> call, Response<Location> response) {
                 if (response.isSuccessful()) {
-                    // Location location = response.body();
                     List<Location.LocationData> locationData = response.body().getData();
                     lat = locationData.get(0).getLatitude();
                     lan = locationData.get(0).getLongitude();

@@ -6,11 +6,15 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.os.Debug;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.runningevents.Login.activities.LoginActivity;
 import com.example.runningevents.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,7 +28,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.regex.Pattern;
 
-public class SignupFragment extends Fragment {
+public class SignupFragment extends Fragment implements TextWatcher {
 
     private static final String TAG = "Signup Fragment";
 
@@ -69,6 +73,7 @@ public class SignupFragment extends Fragment {
         signupBtn = view.findViewById(R.id.signupMbtn);
 
 
+        //Click listeners
         signupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,6 +105,7 @@ public class SignupFragment extends Fragment {
                                         {
                                             Log.d(TAG, "User name is not updated.");
                                         }
+                                        ((LoginActivity) getActivity()).startMainActivity();
                                     }
                                 });
                             }
@@ -111,6 +117,11 @@ public class SignupFragment extends Fragment {
                 }
             }
         });
+
+        nameEditText.addTextChangedListener(this);
+        emailEditText.addTextChangedListener(this);
+        passwordEditText.addTextChangedListener(this);
+        passwordConfirmEditText.addTextChangedListener(this);
 
 
         return view;
@@ -131,7 +142,7 @@ public class SignupFragment extends Fragment {
                 Pattern.compile("^" +
                         "(?=.*[!@#$%^&+=])" +     // at least 1 special character
                         "(?=\\S+$)" +            // no white spaces
-                        ".{6,20}" +                // at least min 6, max 20 characters
+                        ".{6,30}" +             // at least min 6, max 30 characters
                         "$");
         if(password.isEmpty()){
             return false;
@@ -152,5 +163,70 @@ public class SignupFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getView().requestLayout();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if(s == nameEditText.getEditableText() || s == emailEditText.getEditableText()
+        || s == passwordEditText.getEditableText() || s == passwordConfirmEditText.getEditableText()){
+            enableSignUpBtn();
+        }
+
+        if(s == nameEditText.getEditableText()){
+            if (s.length() <= 0) {
+                nameInputLayout.setErrorEnabled(true);
+                nameInputLayout.setError(getString(R.string.enter_name));
+            }
+            else {
+                nameInputLayout.setErrorEnabled(false);
+            }
+        }
+
+        if(s == emailEditText.getEditableText())
+        {
+            if(!isEmailValid(s.toString()))
+            {
+                emailInputLayout.setErrorEnabled(false);
+                emailInputLayout.setError(getString(R.string.invalid_email));
+            }
+            else {
+                emailInputLayout.setErrorEnabled(false);
+            }
+        }
+
+
+
+        if(s == passwordEditText.getEditableText() || s == passwordConfirmEditText.getEditableText())
+        {
+            if(!isPasswordValid(passwordEditText.getText().toString(), passwordConfirmEditText.getText().toString()))
+            {
+                passwordConfirmInputLayout.setErrorEnabled(true);
+                passwordConfirmInputLayout.setError(getString(R.string.passwords_dont_match));
+            }
+            else
+            {
+                passwordConfirmInputLayout.setErrorEnabled(false);
+            }
+        }
+    }
+
+    private void enableSignUpBtn(){
+        if(nameEditText.getText().length() <= 0 && isEmailValid(emailEditText.getText().toString())
+            && isPasswordValid(passwordEditText.getText().toString(), passwordConfirmEditText.getText().toString()))
+        {
+            signupBtn.setEnabled(true);
+        }
+        else {
+            signupBtn.setEnabled(false);
+        }
     }
 }

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.runningevents.Login.activities.LoginActivity;
 import com.example.runningevents.R;
 import com.example.runningevents.Login.activities.ForgotPasswordActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -60,52 +61,6 @@ public class LoginFragment extends Fragment {
 
 
 
-        emailEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(!isEmailValid(s.toString())){
-                    emailInputLayout.setErrorEnabled(true);
-                    emailInputLayout.setError(getString(R.string.email_not_valid));
-                }
-                else
-                {
-                    emailInputLayout.setErrorEnabled(false);
-                }
-            }
-        });
-
-        passwordEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(!isPasswordValid(s.toString()))
-                {
-                    passwordInputLayout.setError(getString(R.string.password_to_short));
-                    passwordInputLayout.setErrorEnabled(true);
-                }
-                else{
-                    passwordInputLayout.setErrorEnabled(false);
-                }
-            }
-        });
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +84,7 @@ public class LoginFragment extends Fragment {
                                     if (task.isSuccessful()) {
                                         Log.d(TAG, "signInWithEmail:success");
                                         FirebaseUser user = firebaseAuth.getCurrentUser();
+                                        ((LoginActivity) getActivity()).startMainActivity();
                                     } else {
                                         Log.w(TAG, "signInWithEmail:failure", task.getException());
                                     }
@@ -137,10 +93,6 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
-
-
-
-
         return view;
     }
 

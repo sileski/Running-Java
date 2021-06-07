@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:title="Settings"
+        android:icon="@drawable/ic_settings">
+        <Preference
+            android:key="login"
+            android:title="@string/login"/>
+
+        <ListPreference
+            android:dialogTitle="@string/language"
+            android:key="select_language"
+            android:title="@string/language"
+            android:entries="@array/language__entries"
+            android:entryValues="@array/language_values"
+            app:useSimpleSummaryProvider="true"
+            android:defaultValue="en"/>
+
+        <Preference
+            android:key="logout"
+            android:title="@string/logout"/>
+    </PreferenceCategory>
+</PreferenceScreen>

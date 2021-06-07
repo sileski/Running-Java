@@ -1,5 +1,6 @@
 package com.example.runningevents.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -10,8 +11,8 @@ import java.util.ArrayList;
 @Entity(tableName = "races")
 public class RaceData implements Serializable {
 
-    @PrimaryKey(autoGenerate = true)
-    private int raceID;
+    @PrimaryKey @NonNull
+    private String raceID;
 
     @ColumnInfo(name = "RaceName")
     private String raceName;
@@ -31,11 +32,11 @@ public class RaceData implements Serializable {
     @ColumnInfo(name = "Categories")
     private ArrayList<String> categories;
 
-    public int getRaceID() {
+    public String getRaceID() {
         return raceID;
     }
 
-    public void setRaceID(int raceID) {
+    public void setRaceID(String raceID) {
         this.raceID = raceID;
     }
 
