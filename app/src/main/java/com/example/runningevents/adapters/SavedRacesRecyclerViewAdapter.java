@@ -5,11 +5,13 @@ import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -66,53 +68,14 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
         //Date and time
         Long timestamp = savedRaceList.get(position).getTimestamp();
         Date d = new Date(timestamp);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy", Locale.getDefault());
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm z", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy", new Locale(Utils.getLanguage(context)));
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm z", new Locale(Utils.getLanguage(context)));
         String date = dateFormat.format(d);
         String time = timeFormat.format(d);
         holder.raceDate.setText(date);
         holder.raceTime.setText(time);
 
-        //Categories
-        ArrayList<String> categories = savedRaceList.get(position).getCategories();
 
-        if(categories.size() > 0) {
-            Collections.sort(categories);
-            holder.raceCategories.setText("");
-            for (int i = 0; i < categories.size(); i++) {
-                if (categories.get(i).equals("Marathon")) {
-                    Spannable spannable = new SpannableString(categories.get(i) + " ");
-                    spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_red)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.raceCategories.append(spannable);
-                } else if (categories.get(i).equals("Half-Marathon")) {
-                    Spannable spannable = new SpannableString(categories.get(i) + " ");
-                    spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_purple)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.raceCategories.append(spannable);
-                } else {
-                    String temp = categories.get(i).substring(0, categories.get(i).length() - 2);
-                    int distance = Integer.valueOf(temp);
-                    if (distance <= 5) {
-                        Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_gold)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.raceCategories.append(spannable);
-                    } else if (distance <= 10) {
-                        Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_blue)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.raceCategories.append(spannable);
-                    } else if (distance <= 21) {
-                        Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_purple)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.raceCategories.append(spannable);
-                    } else {
-                        Spannable spannable = new SpannableString(categories.get(i) + " ");
-                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_red)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.raceCategories.append(spannable);
-                    }
-
-                }
-
-            }
-        }
 
         //Image
         RequestOptions requestOptions = new RequestOptions();
@@ -137,6 +100,53 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
                 })
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.raceImage);
+
+        ArrayList<String> categories = savedRaceList.get(position).getCategories();
+
+        if(categories.size() > 0) {
+            Collections.sort(categories);
+            holder.raceCategories.setText("");
+            for (int i = 0; i < categories.size(); i++) {
+                if(categories.get(i).equals("Marathon"))
+                {
+                    Spannable spannable = new SpannableString(categories.get(i) + " ");
+                    spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_red)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.raceCategories.append(spannable);
+                }
+                else if(categories.get(i).equals("Half-Marathon"))
+                {
+                    Spannable spannable = new SpannableString(categories.get(i) + " ");
+                    spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_purple)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.raceCategories.append(spannable);
+                }
+                else{
+                    String temp = categories.get(i).substring(0, categories.get(i).length() - 2);
+                    int distance = Integer.valueOf(temp);
+                    if(distance <= 5) {
+                        Spannable spannable = new SpannableString(categories.get(i) + " ");
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_gold)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.raceCategories.append(spannable);
+                    }
+                    else if(distance <= 10){
+                        Spannable spannable = new SpannableString(categories.get(i) + " ");
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_blue)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.raceCategories.append(spannable);
+                    }
+                    else if(distance <= 21){
+                        Spannable spannable = new SpannableString(categories.get(i) + " ");
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_purple)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.raceCategories.append(spannable);
+                    }
+                    else {
+                        Spannable spannable = new SpannableString(categories.get(i) + " ");
+                        spannable.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.category_red)), 0, categories.get(i).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.raceCategories.append(spannable);
+                    }
+
+                }
+
+            }
+        }
     }
 
     @Override

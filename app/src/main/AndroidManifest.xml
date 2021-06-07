@@ -13,10 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RunningEvents.NoActionBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Main.activities.RaceSignupActivity"
+            android:theme="@style/Theme.RunningEvents.ForgotPassword">
+        </activity>
         <activity
-            android:name=".FiltersPreferencesActivity"
-            android:theme="@style/Theme.RunningEvents.Filters"></activity>
-        <activity android:name=".RaceDetailsActivity" />
+            android:name=".Main.activities.FiltersPreferencesActivity"
+            android:theme="@style/Theme.RunningEvents.Filters" />
+        <activity android:name=".Main.activities.RaceDetailsActivity" />
         <activity
             android:name=".Login.activities.ForgotPasswordActivity"
             android:label="@string/reset_password"
@@ -31,10 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Main.MainActivity" />
+        <activity android:name=".Main.activities.MainActivity" />
 
         <service
-            android:name=".FirebaseNotificationsService"
+            android:name=".services.FirebaseNotificationsService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

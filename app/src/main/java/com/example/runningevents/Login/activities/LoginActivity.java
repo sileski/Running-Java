@@ -6,17 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.runningevents.Utils;
 import com.example.runningevents.adapters.LoginViewPagerAdapter;
-import com.example.runningevents.Main.MainActivity;
+import com.example.runningevents.Main.activities.MainActivity;
 import com.example.runningevents.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -40,8 +36,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -233,9 +227,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadLanguage(){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String language = prefs.getString("select_language", "en");
-        Log.d("Selected language is ", "selected is " + language);
-        Utils.setAppLocale(language, getResources());
+        Utils.setAppLocale(Utils.getLanguage(getBaseContext()), getResources());
     }
 }

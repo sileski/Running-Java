@@ -17,12 +17,11 @@ public interface RaceDao {
     @Insert(onConflict = REPLACE)
     void insert(RaceData raceData);
 
+    @Query("DELETE FROM races WHERE raceID == :raceId")
+    void deleteById(String raceId);
 
     @Query("SELECT * FROM races")
     List<RaceData> getAll();
-
-    @Query("DELETE FROM races WHERE raceID == :raceId")
-    void deleteById(String raceId);
 
     @Query("SELECT * FROM races WHERE raceID == :raceId")
     boolean ifExist(String raceId);

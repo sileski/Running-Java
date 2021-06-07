@@ -69,8 +69,8 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
 
         //Date and time
         Date d = raceList.get(position).getDate().toDate();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy", new Locale(Utils.getCountry()));
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm z", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy", new Locale(Utils.getLanguage(context)));
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm z", new Locale(Utils.getLanguage(context)));
         String date = dateFormat.format(d);
         String time = timeFormat.format(d);
         holder.raceDate.setText(date);

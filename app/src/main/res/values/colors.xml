@@ -16,4 +16,6 @@
     <color name="category_blue">#2979FF</color>
     <color name="category_purple">#9C27B0</color>
     <color name="category_red">#D32F2F</color>
+
+    <color name="race_title_color">#FF000000</color>
 </resources>

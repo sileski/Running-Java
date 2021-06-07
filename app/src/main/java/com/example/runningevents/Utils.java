@@ -1,10 +1,13 @@
 package com.example.runningevents;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 
 import java.util.Locale;
@@ -28,16 +31,11 @@ public class Utils {
         return vibrantLightColorList[idx];
     }
 
-    public static String getCountry(){
-        Locale locale = Locale.getDefault();
-        String country = String.valueOf(locale.getCountry());
-        return country;
-    }
 
-    public static String getLanguage(){
-        Locale locale = Locale.getDefault();
-        String country = String.valueOf(locale.getLanguage());
-        return country.toLowerCase();
+    public static String getLanguage(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String language = prefs.getString("select_language", "en");
+        return language.toLowerCase();
     }
 
     public static void setAppLocale(String localeCode, Resources resources){

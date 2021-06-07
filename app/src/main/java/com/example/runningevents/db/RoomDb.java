@@ -9,7 +9,7 @@ import androidx.room.TypeConverters;
 
 import com.example.runningevents.models.Race;
 
-@Database(entities = {RaceData.class}, version = 6, exportSchema = false)
+@Database(entities = {RaceData.class}, version = 9, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class RoomDb extends RoomDatabase {
 

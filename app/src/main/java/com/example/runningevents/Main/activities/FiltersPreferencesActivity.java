@@ -1,4 +1,4 @@
-package com.example.runningevents;
+package com.example.runningevents.Main.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -14,6 +14,8 @@ import android.preference.CheckBoxPreference;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.example.runningevents.R;
 
 import java.util.Locale;
 
@@ -33,6 +35,7 @@ public class FiltersPreferencesActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        actionBar.setTitle("Filters");
     }
 
     @Override

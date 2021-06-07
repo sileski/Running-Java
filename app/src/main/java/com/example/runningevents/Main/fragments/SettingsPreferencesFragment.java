@@ -1,24 +1,20 @@
-package com.example.runningevents;
+package com.example.runningevents.Main.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.runningevents.Login.activities.LoginActivity;
-import com.example.runningevents.Main.MainActivity;
+import com.example.runningevents.Main.activities.MainActivity;
+import com.example.runningevents.R;
+import com.example.runningevents.Utils;
+import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Locale;
 
 public class SettingsPreferencesFragment extends PreferenceFragmentCompat {
 
@@ -67,6 +63,7 @@ public class SettingsPreferencesFragment extends PreferenceFragmentCompat {
 
     private void signOut(){
         firebaseAuth.signOut();
+        LoginManager.getInstance().logOut();
         Intent intent = new Intent(((MainActivity) getActivity()), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

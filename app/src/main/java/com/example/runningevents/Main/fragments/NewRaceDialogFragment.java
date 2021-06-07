@@ -1,4 +1,4 @@
-package com.example.runningevents.Main;
+package com.example.runningevents.Main.fragments;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -59,8 +58,6 @@ import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -418,7 +415,7 @@ public class NewRaceDialogFragment extends DialogFragment {
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         Long randomNumber = System.currentTimeMillis() / 1000;
-        String raceId = currentUser.getUid() + randomNumber.toString();
+        String raceId = randomNumber.toString();
 
         //Create race object
         Race race = new Race();
@@ -437,13 +434,14 @@ public class NewRaceDialogFragment extends DialogFragment {
         race.setGeohash(geohash);
 
 
-        db.collection("races")
-                .add(race)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        db.collection("races").document(raceId)
+                .set(race)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "Race is added");
-                        Toast.makeText(getContext(), "New race is added", Toast.LENGTH_LONG).show();
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getContext(), "Your race is successfully added", Toast.LENGTH_LONG).show();
+                        dismiss();
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -452,6 +450,9 @@ public class NewRaceDialogFragment extends DialogFragment {
                         Log.d(TAG, "Error ", e);
                     }
                 });
+
+
+
     }
 
     private boolean isDataValid() {

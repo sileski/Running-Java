@@ -1,4 +1,4 @@
-package com.example.runningevents;
+package com.example.runningevents.Main.fragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.runningevents.R;
 import com.example.runningevents.adapters.RacesRecyclerViewAdapter;
 import com.example.runningevents.adapters.SavedRacesRecyclerViewAdapter;
 import com.example.runningevents.db.RaceData;

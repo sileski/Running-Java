@@ -1,40 +1,31 @@
-package com.example.runningevents.Main;
+package com.example.runningevents.Main.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
-import android.app.FragmentManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import com.example.runningevents.Main.fragments.NewRaceDialogFragment;
+import com.example.runningevents.Main.fragments.RacesFragment;
 import com.example.runningevents.R;
-import com.example.runningevents.SavedRacesFragment;
-import com.example.runningevents.SettingsPreferencesFragment;
-import com.example.runningevents.Utils;
+import com.example.runningevents.Main.fragments.SavedRacesFragment;
+import com.example.runningevents.Main.fragments.SettingsPreferencesFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -60,11 +51,6 @@ public class MainActivity extends AppCompatActivity  {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null)
-        {
-            actionBar.setTitle("Custom Toolbar");
-        }
 
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser.isAnonymous())
