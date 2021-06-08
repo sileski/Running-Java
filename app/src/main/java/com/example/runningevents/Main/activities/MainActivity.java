@@ -1,7 +1,6 @@
 package com.example.runningevents.Main.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -16,6 +15,7 @@ import android.view.View;
 
 import com.example.runningevents.Main.fragments.NewRaceDialogFragment;
 import com.example.runningevents.Main.fragments.RacesFragment;
+import com.example.runningevents.Main.fragments.MyRacesFragment;
 import com.example.runningevents.R;
 import com.example.runningevents.Main.fragments.SavedRacesFragment;
 import com.example.runningevents.Main.fragments.SettingsPreferencesFragment;
@@ -110,6 +110,10 @@ public class MainActivity extends AppCompatActivity  {
 
                         case R.id.saved:
                             selectedFragment = new SavedRacesFragment();
+                            break;
+
+                        case R.id.myraces:
+                            selectedFragment = new MyRacesFragment();
                             break;
 
                         case R.id.settings:

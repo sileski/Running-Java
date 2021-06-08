@@ -34,8 +34,8 @@ public class FiltersPreferencesActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(getResources().getString(R.string.filters));
         }
-        actionBar.setTitle("Filters");
     }
 
     @Override

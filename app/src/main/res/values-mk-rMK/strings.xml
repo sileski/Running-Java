@@ -21,7 +21,7 @@
     <string name="category">Категорија</string>
     <string name="categories">Категори</string>
     <string name="website">Веб страна</string>
-    <string name="nearby">Во близина</string>
+    <string name="nearby">Близина</string>
     <string name="sort">Сортирај</string>
     <string name="all">Сите</string>
     <string name="five_km">5км</string>
@@ -35,4 +35,16 @@
     <string name="cancel">Откажи</string>
     <string name="enter_name">Внеси име</string>
     <string name="language">Јазик</string>
+    <string name="races_distance">Должина на трката</string>
+    <string name="remove_race_message">Дали си сигурен дека сакаш да ја избришиш трката од листана на зачувани трки?</string>
+    <string name="password_helper_message">Помеѓу 8 и 30 карактери и најмалку 1 специјален карактер</string>
+    <string name="invalid_email">Не валиден е-маил</string>
+    <string name="passwords_dont_match">Лозинките не се совпаѓаат</string>
+    <string name="logout">Одјави се</string>
+    <string name="english">Англиски</string>
+    <string name="macedonian">Македонски</string>
+    <string name="settings">Подесувања</string>
+    <string name="select_category">Избери категорија</string>
+    <string name="filters">Филтри</string>
+    <string name="myraces">Мои трки</string>
 </resources>

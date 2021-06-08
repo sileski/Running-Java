@@ -56,6 +56,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.Timestamp;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -176,7 +177,6 @@ public class NewRaceDialogFragment extends DialogFragment {
         countryTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(view.getContext(), "selected item is " + adapterCountries.getItem(position), Toast.LENGTH_LONG).show();
                 String selectedCountry = adapterCountries.getItem(position).toString();
                 getCitiesFromApi(selectedCountry);
             }
@@ -215,25 +215,6 @@ public class NewRaceDialogFragment extends DialogFragment {
 
         return view;
     }
-
-   /* private TextWatcher textWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            if(dateEditText.getText() != null && countryInputLayout.getEditText() != null){
-                Toast.makeText(getContext(), "WORKUVA", Toast.LENGTH_LONG).show();
-            }
-        }
-    }; */
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -412,10 +393,11 @@ public class NewRaceDialogFragment extends DialogFragment {
         categories = new ArrayList<String>(selectedCategory.values());
 
         //Random race id
+        Timestamp time = Timestamp.now();
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         Long randomNumber = System.currentTimeMillis() / 1000;
-        String raceId = randomNumber.toString();
+        String raceId = time.getSeconds() + randomNumber.toString();
 
         //Create race object
         Race race = new Race();
@@ -432,6 +414,7 @@ public class NewRaceDialogFragment extends DialogFragment {
         race.setLatitude(lat);
         race.setLongitude(lan);
         race.setGeohash(geohash);
+        race.setCreatedBy(currentUser.getUid());
 
 
         db.collection("races").document(raceId)
@@ -439,7 +422,7 @@ public class NewRaceDialogFragment extends DialogFragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(getContext(), "Your race is successfully added", Toast.LENGTH_LONG).show();
+                        analyticsEvent(race.getRaceId(), race.getRaceName());
                         dismiss();
 
                     }
@@ -534,7 +517,10 @@ public class NewRaceDialogFragment extends DialogFragment {
         listCountries.add("Macedonia");
         listCountries.add("Serbia");
         listCountries.add("Montenegro");
-        listCountries.add("Germany");
+        listCountries.add("Croatia");
+        listCountries.add("Bulgaria");
+        listCountries.add("Bosnia and Herzegovina");
+        listCountries.add("Slovenia");
 
         return listCountries;
     }
@@ -677,5 +663,13 @@ public class NewRaceDialogFragment extends DialogFragment {
         }
 
         return distanceFilter;
+    }
+
+    private void analyticsEvent(String raceId,String raceName){
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+        Bundle bundle = new Bundle();
+        bundle.putString("raceId", raceId);
+        bundle.putString("raceName", raceName);
+        firebaseAnalytics.logEvent("newRaces", bundle);
     }
 }

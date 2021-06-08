@@ -45,7 +45,6 @@ public class SettingsPreferencesFragment extends PreferenceFragmentCompat {
         languageSelect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Log.d("setinzi", newValue.toString());
                 Utils.setAppLocale(newValue.toString(), getResources());
                 ((MainActivity) getActivity()).finish();
                 return true;
@@ -59,6 +58,20 @@ public class SettingsPreferencesFragment extends PreferenceFragmentCompat {
                 return false;
             }
         });
+
+        login.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                signIn();
+                return false;
+            }
+        });
+    }
+
+    private void signIn(){
+        Intent intent = new Intent(((MainActivity) getActivity()), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void signOut(){

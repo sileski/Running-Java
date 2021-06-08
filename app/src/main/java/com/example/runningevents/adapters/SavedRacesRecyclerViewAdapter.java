@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -90,11 +91,13 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.progressLoadImage.setVisibility(View.GONE);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.progressLoadImage.setVisibility(View.GONE);
                         return false;
                     }
                 })
@@ -169,6 +172,7 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
         TextView raceLocation;
         TextView raceCategories;
         ImageView raceImage;
+        ProgressBar progressLoadImage;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             raceName = itemView.findViewById(R.id.raceName);
@@ -177,6 +181,7 @@ public class SavedRacesRecyclerViewAdapter extends RecyclerView.Adapter<SavedRac
             raceLocation = itemView.findViewById(R.id.locationName);
             raceImage = itemView.findViewById(R.id.raceImage);
             raceCategories = itemView.findViewById(R.id.raceDistance);
+            progressLoadImage = itemView.findViewById(R.id.progress_load_image);
             itemView.setOnClickListener(this);
         }
 

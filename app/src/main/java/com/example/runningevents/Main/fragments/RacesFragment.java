@@ -1,6 +1,7 @@
 package com.example.runningevents.Main.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +38,9 @@ import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -63,7 +68,7 @@ public class RacesFragment extends Fragment {
     FirebaseFirestore db;
 
     boolean lastItemReached = false;
-    DocumentSnapshot lastVisible;
+    DocumentSnapshot lastVisible = null;
     int limit = 3;
 
     RecyclerView racesRecyclerView;
@@ -75,7 +80,6 @@ public class RacesFragment extends Fragment {
 
     String racesSort = "";
     ArrayList<String> racesDistanceFilter = new ArrayList<>();
-    String[] distancesFilter;
 
 
     public RacesFragment() {
@@ -104,6 +108,9 @@ public class RacesFragment extends Fragment {
         LinearLayoutManager mLayoutManager;
         mLayoutManager = new LinearLayoutManager(view.getContext());
         racesRecyclerView.setLayoutManager(mLayoutManager);
+        racesAdapter = new RacesRecyclerViewAdapter(getContext());
+        racesRecyclerView.setAdapter(racesAdapter);
+
 
         getRaces();
 
@@ -142,7 +149,6 @@ public class RacesFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchRaces(query.toLowerCase());
-                Toast.makeText(getContext(), "You searched for " + query, Toast.LENGTH_LONG).show();
                 return false;
             }
 
@@ -155,9 +161,8 @@ public class RacesFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_filter:
-                Toast.makeText(getContext(), "Filter", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getContext(), FiltersPreferencesActivity.class);
                 startActivityForResult(intent, REQUEST_CODE);
                 return true;
@@ -168,12 +173,10 @@ public class RacesFragment extends Fragment {
 
     private void getRaces() {
         loadFilterPreferences();
-        Toast.makeText(getContext(),racesSort, Toast.LENGTH_LONG).show();
         if (racesSort.equals("nearby")) {
             if (isLocationPermissionEnabled()) {
                 com.example.runningevents.models.Location.LocationData locationData = new com.example.runningevents.models.Location.LocationData();
                 getUserLocation();
-                Toast.makeText(getContext(),racesSort + "@22", Toast.LENGTH_LONG).show();
             } else {
                 requestUserToEnableGpsPermission();
             }
@@ -190,10 +193,10 @@ public class RacesFragment extends Fragment {
             Query query;
             Timestamp timestampNow = Timestamp.now();
             if (lastVisible == null) {
-                for(int i =0; i < racesDistanceFilter.size(); i++){
+                for (int i = 0; i < racesDistanceFilter.size(); i++) {
                     Log.d("cjecdsa", "this iss " + racesDistanceFilter.get(i));
                 }
-                query = collectionReference.whereArrayContainsAny("distancesFilter",  racesDistanceFilter).orderBy("date", Query.Direction.ASCENDING).startAfter(timestampNow).limit(limit);
+                query = collectionReference.whereArrayContainsAny("distancesFilter", racesDistanceFilter).orderBy("date", Query.Direction.ASCENDING).startAfter(timestampNow).limit(limit);
             } else {
                 query = collectionReference.whereArrayContainsAny("distancesFilter", racesDistanceFilter).orderBy("date", Query.Direction.ASCENDING).startAfter(timestampNow).startAfter(lastVisible).limit(limit);
             }
@@ -231,7 +234,6 @@ public class RacesFragment extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            System.out.println("GRESKA2");
                         }
                     });
         }
@@ -251,7 +253,7 @@ public class RacesFragment extends Fragment {
                 Query query;
                 if (lastVisible == null) {
                     query = collectionReference
-                            .whereArrayContainsAny("distancesFilter",  racesDistanceFilter)
+                            .whereArrayContainsAny("distancesFilter", racesDistanceFilter)
                             .orderBy("geohash")
                             .orderBy("date", Query.Direction.ASCENDING)
                             .startAt(b.startHash, timestampNow)
@@ -259,7 +261,7 @@ public class RacesFragment extends Fragment {
                             .limit(3);
                 } else {
                     query = collectionReference
-                            .whereArrayContainsAny("distancesFilter",  racesDistanceFilter)
+                            .whereArrayContainsAny("distancesFilter", racesDistanceFilter)
                             .orderBy("geohash")
                             .orderBy("date", Query.Direction.ASCENDING)
                             .startAt(b.startHash, timestampNow)
@@ -320,7 +322,6 @@ public class RacesFragment extends Fragment {
             @Override
             public void onItemClick(View view, int position) {
                 Race race = racesAdapter.getItem(position);
-                Toast.makeText(getContext(), "This is + " + position + "/ " +  race.getRaceName(), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getActivity(), RaceDetailsActivity.class);
                 Gson gson = new Gson();
                 String raceJson = gson.toJson(race);
@@ -373,16 +374,32 @@ public class RacesFragment extends Fragment {
     }
 
     private void getUserLocation() {
-        Log.d("Check", "location");
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
                     getRacesByLocation(location.getLatitude(), location.getLongitude());
+                }
+                else {
+                    LocationRequest locationRequest = new LocationRequest()
+                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                            .setInterval(10000)
+                            .setFastestInterval(1000)
+                            .setNumUpdates(1);
+
+                    LocationCallback locationCallback = new LocationCallback() {
+                        @Override
+                        public void onLocationResult(@NonNull LocationResult locationResult) {
+                            Location location1 = locationResult.getLastLocation();
+                        }
+                    };
+
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                    getUserLocation();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -397,8 +414,8 @@ public class RacesFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE && resultCode == RESULT_CANCELED){
-            if(racesAdapter != null) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_CANCELED) {
+            if (racesAdapter != null) {
                 lastItemReached = false;
                 lastVisible = null;
                 racesAdapter.clear();
@@ -422,7 +439,7 @@ public class RacesFragment extends Fragment {
     }
 
 
-    private void loadFilterPreferences(){
+    private void loadFilterPreferences() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         racesSort = prefs.getString("races_sort", "date");
 
@@ -433,10 +450,10 @@ public class RacesFragment extends Fragment {
         boolean distance42km = prefs.getBoolean("distance_marathon", false);
 
         racesDistanceFilter.clear();
-     //   distancesFilter.
+        //   distancesFilter.
 
         if (distanceAll == true) {
-            List<String> distancesList = Arrays.asList( "1", "2", "3", "4");
+            List<String> distancesList = Arrays.asList("1", "2", "3", "4");
             racesDistanceFilter.addAll(distancesList);
         }
 

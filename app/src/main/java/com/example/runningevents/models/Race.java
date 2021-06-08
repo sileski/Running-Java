@@ -33,6 +33,8 @@ public class Race {
 
     private String geohash;
 
+    private String createdBy;
+
     public String getRaceId() {
         return raceId;
     }
@@ -135,6 +137,14 @@ public class Race {
 
     public void setGeohash(String geohash) {
         this.geohash = geohash;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createtBy) {
+        this.createdBy = createtBy;
     }
 
     //participants

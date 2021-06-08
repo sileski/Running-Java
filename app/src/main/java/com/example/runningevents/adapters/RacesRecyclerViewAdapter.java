@@ -49,6 +49,14 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
         this.raceList = raceList;
     }
 
+    public RacesRecyclerViewAdapter(Context context) {
+        this.context = context;
+    }
+
+    public void setData(List<Race> raceList){
+        this.raceList = raceList;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -153,7 +161,17 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
 
     @Override
     public int getItemCount() {
-        return raceList.size();
+        int value = 0;
+        if(raceList != null) {
+            if (raceList.size() > 0) {
+                value = raceList.size();
+            }
+        }
+
+        else {
+            value = 0;
+        }
+        return value;
     }
 
     public Race getItem(int position){
@@ -166,10 +184,12 @@ public class RacesRecyclerViewAdapter extends RecyclerView.Adapter<RacesRecycler
     }
 
     public void clear() {
-        int size = raceList.size();
-        if(size > 0) {
-            raceList.clear();
-            notifyItemRangeRemoved(0, size);
+        if(raceList != null) {
+            int size = raceList.size();
+            if (size > 0) {
+                raceList.clear();
+                notifyItemRangeRemoved(0, size);
+            }
         }
     }
 
